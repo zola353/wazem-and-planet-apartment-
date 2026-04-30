@@ -1,0 +1,2701 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Wazema | Planet Apartments - የባለአክሲዮን ክትትል ስርዓት (የተሻሻለ)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Noto Sans Ethiopic', sans-serif
+        }
+        body {
+            background: linear-gradient(135deg, #556b2f, #1a472a);
+            min-height: 100vh
+        }
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center
+        }
+        .login-card {
+            background: white;
+            border-radius: 2rem;
+            width: 450px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.4);
+            border-top: 5px solid #ff9800
+        }
+        .scrolling-title {
+            overflow: hidden;
+            white-space: nowrap;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            color: #e65100
+        }
+        .scrolling-title span {
+            display: inline-block;
+            animation: scrollText 15s linear infinite
+        }
+        @keyframes scrollText {
+            0% {
+                transform: translateX(100%)
+            }
+            100% {
+                transform: translateX(-100%)
+            }
+        }
+        .user-type {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0
+        }
+        .user-type button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            font-weight: bold;
+            cursor: pointer
+        }
+        .user-type button.active {
+            background: #ff9800;
+            border-color: #ff9800;
+            color: white
+        }
+        .pwd-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center
+        }
+        .pwd-wrapper input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            border: 1px solid #ccc;
+            padding-right: 40px
+        }
+        .toggle-eye {
+            position: absolute;
+            right: 15px;
+            cursor: pointer;
+            color: #ff9800;
+            background: white
+        }
+        .login-btn {
+            background: linear-gradient(95deg, #1a472a, #0b2b1a);
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 1rem;
+            cursor: pointer
+        }
+        .login-loader-container {
+            margin-top: 20px;
+            text-align: center;
+            display: none
+        }
+        .login-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #ff9800;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 8px
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg)
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.75rem;
+            margin-top: 8px
+        }
+        .main-content {
+            display: none
+        }
+        .top-bar {
+            background: #1a472a;
+            color: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 2px solid #ff9800
+        }
+        .badge-admin {
+            background: #ff9800;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.7rem;
+            color: #1a472a;
+            font-weight: bold
+        }
+        .badge-member {
+            background: #2c7da0;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.7rem;
+            color: white
+        }
+        .tab-bar {
+            background: white;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            flex-wrap: wrap
+        }
+        .tab-btn {
+            background: #e8f5e9;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            color: #1a472a
+        }
+        .tab-btn.active {
+            background: #ff9800;
+            color: white
+        }
+        .container {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 1rem
+        }
+        .tab-pane {
+            display: none
+        }
+        .tab-pane.active {
+            display: block
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+            border-top: 3px solid #ff9800
+        }
+        .material-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 1rem
+        }
+        .material-btn {
+            background: #e8f5e9;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            background: white
+        }
+        .data-table th {
+            background: #1a472a;
+            color: white;
+            padding: 12px 8px;
+            text-align: left
+        }
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+            color: #212121;
+            vertical-align: middle
+        }
+        .btn-sm {
+            background: #ff9800;
+            border: none;
+            color: #1a472a;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin: 2px;
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            font-weight: bold;
+            transition: 0.2s
+        }
+        .btn-sm:hover {
+            background: #e68900;
+            transform: scale(1.02)
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white
+        }
+        .btn-warning {
+            background: #e67e22;
+            color: white
+        }
+        .member-stat-panel {
+            background: linear-gradient(120deg, #ff9800, #e65100);
+            color: white;
+            border-radius: 24px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem
+        }
+        .admin-filter {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+        .summary-chips {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px
+        }
+        .chip-cat {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+            min-width: 100px;
+            color: white
+        }
+        .chip-cat:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.02)
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            background: #e8f5e9;
+            border-radius: 40px;
+            padding: 8px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+        .collapsible-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0
+        }
+        .collapsible-content {
+            display: none;
+            padding-top: 15px
+        }
+        .collapsible-content.show {
+            display: block
+        }
+        .footer {
+            background: #1a472a;
+            color: #ccc;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-top: 2px solid #ff9800;
+            text-align: center
+        }
+        .clickable-hint {
+            cursor: pointer;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.5)
+        }
+        .marquee-wrapper {
+            background: #fff3cd;
+            padding: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-radius: 8px;
+            margin-bottom: 15px
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: scroll-left 25s linear infinite;
+            font-weight: bold;
+            color: #1a472a
+        }
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(100%)
+            }
+            100% {
+                transform: translateX(-100%)
+            }
+        }
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px
+        }
+        .print-table th,
+        .print-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px
+        }
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px
+        }
+        .category-btn {
+            background: #e8f5e9;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: 0.2s
+        }
+        .category-btn.active {
+            background: #ff9800;
+            color: white
+        }
+        .chart-container {
+            width: 100%;
+            max-height: 400px;
+            margin-top: 20px;
+            background: #f9f9f9;
+            border-radius: 20px;
+            padding: 10px
+        }
+        .green-bold {
+            color: #2e7d32;
+            font-weight: bold
+        }
+        .stat-blue {
+            color: #0066cc;
+            font-weight: bold
+        }
+        .stat-green {
+            color: #2e7d32;
+            font-weight: bold
+        }
+        .stat-orange {
+            color: #e67e22;
+            font-weight: bold
+        }
+        .analysis-card {
+            background: #f0f8ff;
+            border-left: 5px solid #1a472a
+        }
+        .analysis-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 15px 0
+        }
+        .analysis-item {
+            background: #fff;
+            border-radius: 16px;
+            padding: 12px;
+            flex: 1;
+            min-width: 180px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 1px solid #ff9800
+        }
+        .analysis-percent {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #1a472a
+        }
+        .analysis-label {
+            font-size: 0.75rem;
+            color: #555;
+            font-weight: bold
+        }
+        .admin-only {
+            display: block
+        }
+        .member-only {
+            display: none
+        }
+        .action-buttons {
+            white-space: nowrap
+        }
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: flex-end;
+            flex-wrap: wrap
+        }
+        .member-analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px
+        }
+        .member-analysis-title {
+            font-weight: bold;
+            font-size: 1.1rem
+        }
+        .member-analysis-actions {
+            display: flex;
+            gap: 8px
+        }
+        .bold-text {
+            font-weight: bold
+        }
+        .status-message {
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center
+        }
+        .status-warning {
+            background: #ffcccc;
+            color: #cc0000;
+            border: 1px solid #cc0000
+        }
+        .status-success {
+            background: #ccffcc;
+            color: #006600;
+            border: 1px solid #006600
+        }
+        .status-scroll {
+            overflow: hidden;
+            white-space: nowrap
+        }
+        .status-scroll-inner {
+            display: inline-block;
+            animation: scroll-left 18s linear infinite
+        }
+        .member-extra-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 0.8rem
+        }
+        .member-extra-info strong {
+            color: #fff
+        }
+        .share-transfer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px
+        }
+        .share-transfer-grid input,
+        .share-transfer-grid select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc
+        }
+        .witness-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 4px
+        }
+        .witness-row input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc
+        }
+        .purchase-entry {
+            border: 1px dashed #ff9800;
+            padding: 10px;
+            border-radius: 12px;
+            margin: 8px 0;
+            background: #fffbf0
+        }
+        .purchase-entry h5 {
+            color: #e65100;
+            margin-bottom: 6px
+        }
+        .warning-card {
+            background: linear-gradient(135deg, #fff3cd, #ffe0b2);
+            border-left: 6px solid #e65100;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1)
+        }
+        .warning-marquee {
+            background: #ffcccc;
+            padding: 8px 15px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid #cc0000
+        }
+        .warning-marquee-inner {
+            display: inline-block;
+            animation: scroll-left 20s linear infinite;
+            font-weight: bold;
+            color: #cc0000;
+            font-size: 0.9rem
+        }
+        .encouragement-marquee {
+            background: #ccffcc;
+            padding: 8px 15px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid #006600
+        }
+        .encouragement-marquee-inner {
+            display: inline-block;
+            animation: scroll-left 22s linear infinite;
+            font-weight: bold;
+            color: #006600;
+            font-size: 0.9rem
+        }
+        .warning-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 10px
+        }
+        .warning-summary-item {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06)
+        }
+        .warning-summary-item .warn-num {
+            font-size: 1.4rem;
+            font-weight: bold
+        }
+        .warn-red {
+            color: #cc0000
+        }
+        .warn-green {
+            color: #006600
+        }
+        .warn-orange {
+            color: #e67e22
+        }
+        .ai-panel {
+            background: #f0f4ff;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px solid #1a472a
+        }
+        .ai-panel h4 {
+            color: #1a472a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        .ai-chat-box {
+            max-height: 350px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            min-height: 100px
+        }
+        .ai-input-row {
+            display: flex;
+            gap: 8px
+        }
+        .ai-input-row input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            font-size: 0.85rem
+        }
+        .ai-input-row button {
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: bold
+        }
+        .ai-message {
+            padding: 8px 14px;
+            border-radius: 14px;
+            margin: 6px 0;
+            max-width: 92%;
+            font-size: 0.8rem;
+            word-wrap: break-word;
+            line-height: 1.5
+        }
+        .ai-user {
+            background: #ff9800;
+            color: white;
+            margin-left: auto;
+            text-align: right
+        }
+        .ai-bot {
+            background: #e8f5e9;
+            color: #1a472a;
+            border: 1px solid #c8e6c9
+        }
+        .ai-typing {
+            display: none;
+            color: #888;
+            font-style: italic;
+            padding: 8px 14px;
+            font-size: 0.8rem
+        }
+        .ai-typing.show {
+            display: block
+        }
+        @media print {
+            body * {
+                visibility: hidden
+            }
+            #printArea,
+            #printArea * {
+                visibility: visible
+            }
+            #printArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block !important;
+                padding: 20px;
+                background: white
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse
+            }
+            .print-table th,
+            .print-table td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: left;
+                font-size: 12px
+            }
+            .print-header {
+                margin-bottom: 20px;
+                text-align: center;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px
+            }
+            .watermark-text {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-25deg);
+                font-size: 32px;
+                color: rgba(0, 0, 0, 0.1);
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 9999;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 2px
+            }
+        }
+        @media (max-width:768px) {
+            .top-bar {
+                flex-direction: column;
+                text-align: center
+            }
+            .marquee-wrapper {
+                white-space: normal
+            }
+            .scrolling-title span {
+                animation: none;
+                white-space: normal
+            }
+            .chip-cat {
+                min-width: 80px;
+                font-size: 0.7rem
+            }
+            .data-table td,
+            .data-table th {
+                padding: 6px 4px;
+                font-size: 0.7rem
+            }
+            .btn-sm {
+                padding: 3px 8px;
+                font-size: 0.6rem
+            }
+            .share-transfer-grid {
+                grid-template-columns: 1fr
+            }
+            .warning-summary-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+</head>
+<body>
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <div class="scrolling-title"><span><i class="fas fa-building"></i> የኮክ ትሬዲንግ ባለቤት የሆኑት ዋዜማ እና ፕላኔት አፓርትመንት</span></div>
+            <h2><i class="fas fa-chart-line"></i> የአክሲዮን ክትትል ስርዓት</h2>
+            <p>🏢 የአባላት አስተዳደር ስርዓት</p>
+            <div class="user-type"><button id="adminTypeBtn" class="active" onclick="setRole('admin')"><i class="fas fa-user-shield"></i> አድሚን</button><button id="memberTypeBtn" onclick="setRole('member')"><i class="fas fa-users"></i> አባል</button></div>
+            <div class="pwd-wrapper"><input type="password" id="loginPass" placeholder="ፓስዎርድ / አይዲ"><i class="fas fa-eye toggle-eye" onclick="togglePass()"></i></div>
+            <button class="login-btn" onclick="handleLogin()"><i class="fas fa-sign-in-alt"></i> ይግቡ</button>
+            <div id="loginLoaderContainer" class="login-loader-container"><div class="login-spinner"></div><div>Loading...</div></div>
+            <div id="loginErrorMsg" class="error-msg"></div>
+        </div>
+    </div>
+    <div id="printArea" style="display:none;"></div>
+    <div id="mainApp" class="main-content">
+        <div class="top-bar"><div><span id="userBadge" class="badge-admin">አድሚን</span> <button class="btn-sm" onclick="logout()" style="background:#c0392b;color:white;"><i class="fas fa-sign-out-alt"></i> ውጣ</button></div></div>
+        <div class="marquee-wrapper"><div class="marquee-content" id="movingAnnounce">ምንም አዲስ ማስታወቂያ የለም</div></div>
+
+        <div id="memberStatusMessage" class="status-message status-scroll" style="display:none;"><div class="status-scroll-inner" id="memberStatusText"></div></div>
+
+        <div id="memberPersonalPanelOutside" class="card member-only" style="display:none;">
+            <div class="member-stat-panel" style="margin-bottom:0;">
+                <div><h3><span id="currentMemberName">-</span></h3><p><strong>ኮድ:</strong> <span id="currentMemberId">-</span> | <strong>ጾታ:</strong> <span id="currentMemberGender">-</span></p><p><strong>ማህበር:</strong> <span id="currentMemberAssociation">-</span> | <strong>ባለቤትነት:</strong> <span id="currentMemberStatus">-</span></p><p><strong>አክሲዮን:</strong> <span id="currentMemberShares">0</span> | <strong>ስልክ:</strong> <span id="currentMemberPhone">-</span></p><p><strong>አድራሻ:</strong> <span id="currentMemberAddress">-</span></p><div id="memberBuyerExtraInfo" class="member-extra-info" style="display:none;"></div></div>
+                <div><div>መደበኛ መዋጮ: <strong id="memberRegularTotal">0</strong> ብር</div><div>ልዩ መዋጮ: <strong id="memberSpecialTotal">0</strong> ብር</div><div>ጠቅላላ መዋጮ: <strong id="memberTotalContribution">0</strong> ብር</div><div>የሚጠበቅ አጠቃላይ: <strong id="memberExpected">0</strong> ብር</div><div>ቀሪ ክፍያ: <strong id="memberRemaining">0</strong> ብር</div></div>
+            </div>
+        </div>
+
+        <div id="memberIdDisplay" class="card" style="background:#f0f8ff;padding:0.5rem;margin-bottom:0;display:none;text-align:center;font-weight:bold;border-top:none;box-shadow:none;">
+            <i class="fas fa-id-badge"></i> ኮድዎ: <span id="memberIdShown"></span>
+        </div>
+        <div class="tab-bar"><button class="tab-btn active" data-tab="construction"><i class="fas fa-hard-hat"></i> የግንባታ ቁሳቁስ</button><button class="tab-btn" data-tab="members"><i class="fas fa-hand-holding-usd"></i> የአባላት መዋጮ</button></div>
+        <div class="container">
+            <!-- Construction Tab -->
+            <div id="constructionPane" class="tab-pane active">
+                <div class="card" style="background:#f8f9fa;border-left:5px solid #556b2f;"><h3>ጠቅላላ የግንባታ ቁሳቁስ ወጪ ድምር፡ <span id="totalMaterialExpense">0</span> ብር</h3></div>
+                <div class="card" style="background:linear-gradient(105deg,#ff9800,#e65100);color:white;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;"><div id="totalCostBox" class="clickable-hint" style="background:rgba(0,0,0,0.3);padding:0.5rem 1rem;border-radius:20px;"><div>ጠቅላላ ወጪ</div><div id="totalConstructionCost" style="font-size:2rem;font-weight:bold;">0.00</div><small>ብር</small></div><div id="materialSummaryChips" class="summary-chips"></div></div></div>
+                <div id="purchaseAnalysisCard" class="card admin-only"><div class="collapsible-header" onclick="togglePurchaseAnalysis()"><h3><i class="fas fa-chart-pie"></i> የግዥ ትንተና (Purchase Analysis) & የስንብት መመለስ %</h3><i id="purchaseAnalysisIcon" class="fas fa-chevron-down"></i></div><div id="purchaseAnalysisContent" class="collapsible-content"><div id="purchaseAnalysisStats" class="analysis-stats"></div><div id="refundAnalysisStats" class="analysis-stats"></div><div id="financialSourceStats" class="analysis-stats"></div></div></div>
+                <div id="detailedReportPanel" class="card" style="background:#1a472a;color:white;display:none;"><h3>ዝርዝር ሪፖርት</h3><div id="specStatsContainer"></div></div>
+                <div class="card admin-only" id="adminNewPurchaseCard"><div class="collapsible-header" onclick="toggleNewPurchaseCard()"><h3><i class="fas fa-cart-plus"></i> አዲስ ዕቃ ግዥ</h3><i class="fas fa-chevron-down" id="newPurchaseCardIcon"></i></div><div id="newPurchaseCardContent" class="collapsible-content"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"><input type="text" id="newReceiptNo" placeholder="ተ.ቁጥር"><input type="date" id="newPurchaseDate"><select id="newMaterialCat"><option value="iron">ብረት</option><option value="nail">ሚስማር</option><option value="cement">ሲሚንቶ</option><option value="gravel">ጠጠር</option><option value="ash">አሽዋ</option><option value="others">ሌሎች</option></select><div id="subTypeContainer"><select id="newMaterialSubType"><option>8ሚሜ</option><option>10ሚሜ</option><option>12ሚሜ</option><option>14ሚሜ</option><option>16ሚሜ</option><option>18ሚሜ</option><option>20ሚሜ</option><option>22ሚሜ</option><option>24ሚሜ</option></select></div><select id="newUnit"><option>ቁጥር</option><option>ቤርጋ</option><option>ኩንታል</option><option>ሜትር</option><option>ኪሎግራም</option><option>ኩብ ሜትር</option><option>ደስታ</option><option>ፓኬት</option><option>ዎር</option></select><input type="number" id="newQuantity" placeholder="ብዛት"><input type="number" id="newPricePerUnit" placeholder="ዋጋ/አንድ"><input type="text" id="newSupplier" placeholder="አቅራቢ"></div><button class="btn-sm btn-success" onclick="addNewPurchase()">ግዥ መዝግብ</button></div></div>
+
+                <!-- Share Transfer Card (admin only) restored -->
+                <div id="shareTransferCard" class="card admin-only">
+                    <div class="collapsible-header" onclick="toggleShareTransferCard()"><h3><i class="fas fa-exchange-alt"></i> የአክሲዮን ማስተላለፊያ ፎርም (Share Transfer)</h3><i id="shareTransferCardIcon" class="fas fa-chevron-down"></i></div>
+                    <div id="shareTransferCardContent" class="collapsible-content">
+                        <h4 style="border-bottom:2px solid #ff9800;padding-bottom:8px;margin-bottom:12px;">📋 የአክሲዮን ማስተላለፊያ ቅፅ</h4>
+                        <div class="share-transfer-grid">
+                            <select id="stAssociation"><option value="Wazema">ዋዜማ</option><option value="Planet">ፕላኔት</option></select>
+                            <select id="stEntryType" onchange="toggleSTPurchaseFields()"><option value="founder">መስራች</option><option value="buyer">ገዝቶ የገባ</option></select>
+                            <input type="text" id="stTransferorName" placeholder="የአክሲዮን አስተላላፊ ስም">
+                            <select id="stTransferorGender"><option>ወንድ</option><option>ሴት</option></select>
+                            <input type="text" id="stTransferorPhone" placeholder="ስልክ ቁጥር">
+                            <input type="number" id="stTransferorShares" placeholder="ያለው እጣ" value="0">
+                            <input type="number" id="stSharesToTransfer" placeholder="የሚተላለፍ እጣ ብዛት" value="0">
+                            <input type="number" id="stTransferorSaved" placeholder="እስከሚተላለፍ የቆጠበው ብር" value="0">
+                            <input type="number" id="stTransferAmount" placeholder="የሚተላለፍ ገንዘብ" value="0">
+                            <input type="date" id="stTransferDate" placeholder="የተላለፈበት ቀን">
+                        </div>
+                        <div style="margin-top:8px;"><strong>የነበሩ እማኞች:</strong></div>
+                        <div class="witness-row"><input type="text" id="stWitness1" placeholder="1/ አቶ/ወሮ/ሪት ስም"><input type="text" id="stWitnessTitle1" placeholder="አቶ/ወሮ/ሪት" style="max-width:120px;"></div>
+                        <div class="witness-row"><input type="text" id="stWitness2" placeholder="2/ አቶ/ወሮ/ሪት ስም"><input type="text" id="stWitnessTitle2" placeholder="አቶ/ወሮ/ሪት" style="max-width:120px;"></div>
+                        <div class="witness-row"><input type="text" id="stWitness3" placeholder="3/ አቶ/ወሮ/ሪት ስም"><input type="text" id="stWitnessTitle3" placeholder="አቶ/ወሮ/ሪት" style="max-width:120px;"></div>
+                        <div id="stPurchaseInfoFields" style="display:none;">
+                            <div class="purchase-entry" id="stPrimaryPurchase">
+                                <h5>ከማን ገዛ (ዋና ግዢ)</h5>
+                                <div class="share-transfer-grid">
+                                    <input type="text" id="stPurchasedFrom" placeholder="ከማን ገዛ - ስም">
+                                    <input type="number" id="stPurchasedShares" placeholder="የተላለፈለት እጣ ብዛት" value="0">
+                                    <input type="number" id="stPurchasedAmount" placeholder="የተላለፈለት የገንዘብ መጠን" value="0">
+                                </div>
+                            </div>
+                            <div id="stAdditionalPurchases"></div>
+                            <button type="button" class="btn-sm btn-warning" onclick="addSTAdditionalPurchase()" style="margin-top:8px;">+ ተጨማሪ ገዥ ጨምር</button>
+                        </div>
+                        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                            <button class="btn-sm btn-success" onclick="saveShareTransfer()">💾 መዝግብ</button>
+                            <button class="btn-sm btn-warning" onclick="printAllShareTransfers()"><i class="fas fa-print"></i> ሁሉንም አትም</button>
+                            <button class="btn-sm btn-warning" onclick="printSelectedShareTransfers()"><i class="fas fa-print"></i> የተመረጡትን አትም</button>
+                            <button class="btn-sm btn-success" onclick="exportShareTransfersToExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+                        </div>
+                        <div id="shareTransferListContainer" style="margin-top:15px;overflow-x:auto;"></div>
+                    </div>
+                </div>
+
+                <div class="card"><div class="collapsible-header" onclick="togglePurchaseReport()"><h3><i class="fas fa-chart-bar"></i> የግዥ ሪፖርት</h3><i id="purchaseReportIcon" class="fas fa-chevron-down"></i></div><div id="purchaseReportContent" class="collapsible-content"><div class="admin-filter"><span>ከቀን:</span><input type="date" id="purchaseReportStart"><span>እስከ ቀን:</span><input type="date" id="purchaseReportEnd"></div><div class="category-buttons" id="purchaseCatButtons"></div><div><button class="btn-sm" onclick="filterPurchaseReport()">አጣራ</button><button class="btn-sm btn-success admin-only" onclick="exportPurchaseReportExcel()">Excel</button></div><div id="purchaseReportResults" style="margin-top:15px;overflow-x:auto;"></div></div></div>
+                <div id="remainingFilterCard" class="card admin-only">
+                    <div class="collapsible-header" onclick="toggleRemainingFilter()"><h3><i class="fas fa-filter"></i> የስንብት እና ማስታዎቂያ ማጣሪያ (ቀሪ ክፍያ ≥)</h3><i id="remainingFilterIcon" class="fas fa-chevron-down"></i></div>
+                    <div id="remainingFilterContent" class="collapsible-content">
+                        <div class="admin-filter"><label>ዝቅተኛ ቀሪ ክፍያ (≥ ብር): <input type="number" id="remainingFilterAmount" value="0" step="100"></label><label>ማህበር: <select id="remainingFilterSociety"><option value="all">ሁሉም</option><option value="Wazema">ዋዜሜ</option><option value="Planet">ፕላኔት</option></select></label><label>ባለቤትነት: <select id="remainingFilterStatus"><option value="all">ሁሉም</option><option value="founder">መስራች</option><option value="buyer">ገዝቶ የገባ</option></select></label><button class="btn-sm" onclick="applyRemainingFilter()">አሳይ</button></div>
+                        <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-sm btn-warning" onclick="printSelectedRemaining()"><i class="fas fa-print"></i> የተመረጡትን አትም</button><button class="btn-sm btn-warning" onclick="printAllRemainingFiltered()"><i class="fas fa-print"></i> ሁሉንም አትም</button><button class="btn-sm btn-success" onclick="exportRemainingToExcel()"><i class="fas fa-file-excel"></i> Excel</button></div>
+                        <div id="remainingFilterResults" style="overflow-x:auto;"></div>
+                    </div>
+                </div>
+                <div class="material-nav" id="materialNav"></div><div id="materialSectionContainer"></div>
+                <div id="adminAnnounceWrapper" class="card admin-only"><div class="collapsible-header" onclick="toggleAnnouncements()"><h3><i class="fas fa-bullhorn"></i> ማስታወቂያዎች</h3><i id="announceIcon" class="fas fa-chevron-down"></i></div><div id="announcementsContent" class="collapsible-content"><div style="background:#1a472a;padding:1rem;border-radius:20px;color:white;"><input type="text" id="newAnnounceText" placeholder="ፅሁፍ"><button class="btn-sm" onclick="addAnnouncement()">+ ጨምር</button><div id="announcementList"></div></div></div></div>
+            </div>
+            <!-- Members Tab -->
+            <div id="membersPane" class="tab-pane">
+                <div class="card admin-only"><div class="collapsible-header" onclick="toggleSharePriceCard()"><h3><i class="fas fa-coins"></i> የአንድ አክሲዮን ዋጋ አወቃቀር (Share Price Configuration)</h3><i id="sharePriceIcon" class="fas fa-chevron-down"></i></div><div id="sharePriceContent" class="collapsible-content"><div class="admin-filter"><label>የአንድ አክሲዮን ዋጋ (ብር): <input type="number" id="sharePriceInput" step="100" value="200000"></label><button class="btn-sm btn-success" onclick="updateSharePrice()">አዘምን</button></div><div id="sharePriceDisplay" class="bold-text" style="margin-top:10px;"></div></div></div>
+                <div id="adminStatsCard" class="card admin-only" style="background:linear-gradient(95deg,#1a472a,#0b2b1a);color:white;"><h3>አጠቃላይ ስታቲስቲክስ</h3><div>ጠቅላላ መዋጮ: <strong id="totalAllContrib">0</strong> ብር | አክሲዮን: <strong id="totalSharesAll">0</strong> | አባላት: <strong id="totalMembersCount">0</strong></div><div>የሚጠበቅ አጠቃላይ ገንዘብ: <strong id="totalExpected">0</strong> ብር | ቀሪ ክፍያ: <strong id="totalRemaining">0</strong> ብር</div></div>
+
+                <!-- WARNING & ENCOURAGEMENT CARD (NEW - Request 1) -->
+                <div id="warningEncouragementCard" class="card warning-card admin-only">
+                    <div class="collapsible-header" onclick="toggleWarningEncouragement()">
+                        <h3><i class="fas fa-exclamation-triangle"></i> ዉዝፍ እና ማበረታቻ መግለጫ</h3>
+                        <i id="warningEncouragementIcon" class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="warningEncouragementContent" class="collapsible-content">
+                        <div class="warning-marquee"><div class="warning-marquee-inner" id="warningMarqueeText">ያንተ እኩል አለመክፈል ሙሉ የከፈሉትን ይጎዳል እና ክፈል!!!</div></div>
+                        <div class="encouragement-marquee"><div class="encouragement-marquee-inner" id="encouragementMarqueeText">✅ ሙሉ ክፍያ የፈጸሙ አባላት ምስጋና ይገባቸዋል!</div></div>
+                        <div class="warning-summary-grid" id="warningSummaryGrid"></div>
+                        <div style="margin-top:10px;overflow-x:auto;" id="warningDetailTable"></div>
+                    </div>
+                </div>
+
+                <div id="memberAnalysisCard" class="card admin-only">
+                    <div class="collapsible-header" onclick="toggleMemberAnalysisCard()"><h3><i class="fas fa-chart-pie"></i> የአባላት ትንተና (Member Analysis)</h3><i id="memberAnalysisCardIcon" class="fas fa-chevron-down"></i></div>
+                    <div id="memberAnalysisCardContent" class="collapsible-content">
+                        <div id="memberAnalysisSharesContainer" class="analysis-stats" style="margin-bottom:20px;"></div>
+                        <div id="memberAnalysisContainer" class="analysis-stats" style="margin-bottom:20px;"></div>
+                        <div class="admin-only member-analysis-actions" style="display:flex;gap:8px;justify-content:flex-end;"><button class="btn-sm btn-success" onclick="exportMemberAnalysisToExcel()"><i class="fas fa-file-excel"></i> Excel</button><button class="btn-sm btn-danger" onclick="exportMemberAnalysisToPDF()"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn-sm btn-warning" onclick="printMemberAnalysis()"><i class="fas fa-print"></i> አትም</button></div>
+                    </div>
+                </div>
+                <div id="adminAnalysisCard" class="card analysis-card admin-only"><div class="collapsible-header" onclick="toggleAnalysisCard()"><h3><i class="fas fa-chart-pie"></i> የማህበሩ ትንተና (Analysis)</h3><i id="analysisIcon" class="fas fa-chevron-down"></i></div><div id="analysisContent" class="collapsible-content"><div class="admin-filter"><label>ማህበር: <select id="analysisSociety"><option value="all">ሁሉም</option><option value="Wazema">ዋዜሜ</option><option value="Planet">ፕላኔት</option></select></label><label>የክፍያ አይነት: <select id="analysisContribType"><option value="all">ሁሉም</option><option value="regular">መደበኛ</option><option value="special">ልዩ</option></select></label><label>ከቀን: <input type="date" id="analysisStartDate"></label><label>እስከ ቀን: <input type="date" id="analysisEndDate"></label><button class="btn-sm" onclick="runAnalysis()">አስላ</button><button class="btn-sm btn-warning" onclick="printAnalysisReport()">አትም</button></div><div id="analysisResults" class="analysis-stats"></div><div class="chart-container"><canvas id="analysisPieChart"></canvas></div>
+                        <!-- DeepSeek AI Panel for Admin Analysis (Request 3) -->
+                        <div class="ai-panel" id="adminAIPanel">
+                            <h4><i class="fas fa-robot"></i> DeepSeek AI ትንተና ረዳት</h4>
+                            <p style="font-size:0.75rem;color:#555;">ስለ ማህበሩ መረጃ፣ አባላት፣ መዋጮ እና ወጪዎች ይጠይቁ</p>
+                            <div class="ai-chat-box" id="adminAIChatBox">
+                                <div class="ai-message ai-bot">👋 ሰላም! ስለ ማህበሩ አጠቃላይ መረጃ፣ የአባላት ሁኔታ፣ የመዋጮ ሪፖርት፣ የግንባታ ወጪ እና ሌሎችም መጠየቅ ይችላሉ።</div>
+                            </div>
+                            <div class="ai-typing" id="adminAITyping">DeepSeek AI እያሰበ ነው...</div>
+                            <div class="ai-input-row">
+                                <input type="text" id="adminAIQuestion" placeholder="ለምሳሌ፡ ያልከፈሉ አባላት ዝርዝር አሳይ...">
+                                <button class="btn-sm btn-success" onclick="askAdminAI()"><i class="fas fa-paper-plane"></i> ጠይቅ</button>
+                                <button class="btn-sm btn-warning" onclick="clearAdminAIChat()"><i class="fas fa-trash"></i> አጽዳ</button>
+                            </div>
+                        </div>
+                </div></div>
+                <div id="adminContributionPanel" class="card admin-only"><div class="collapsible-header" onclick="toggleAdminContributionPanel()"><h3>መዋጮ መዝግብ</h3><i id="adminContributionIcon" class="fas fa-chevron-down"></i></div><div id="adminContributionContent" class="collapsible-content"><div class="admin-filter"><label><input type="radio" name="adminMemberFilter" value="all" checked onchange="filterMembersByType('all')"> ሁሉም</label><label><input type="radio" name="adminMemberFilter" value="Wazema" onchange="filterMembersByType('Wazema')"> ዋዜሜ</label><label><input type="radio" name="adminMemberFilter" value="Planet" onchange="filterMembersByType('Planet')"> ፕላኔት</label></div><div class="admin-filter"><label><input type="radio" name="contributionType" value="regular" checked> መደበኛ</label><label><input type="radio" name="contributionType" value="special"> ልዩ</label></div><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;"><select id="contributionMemberSelect" style="flex:2;min-width:150px;"></select><input type="date" id="contributionDate" style="flex:1;"><input type="number" id="contributionAmount" placeholder="መጠን" style="flex:1;"><input type="text" id="bankCodeInput" placeholder="ባንክ ኮድ" style="flex:3;min-width:200px;"><button class="btn-sm btn-success" onclick="addContribution()">መዝግብ</button></div></div></div>
+                <!-- Work Payment Registration Card -->
+                <div class="card admin-only">
+                    <div class="collapsible-header" onclick="toggleWorkPaymentCard()"><h3><i class="fas fa-tools"></i> የስራ ማስኪጃ መመዝገቢያ</h3><i id="workPaymentIcon" class="fas fa-chevron-down"></i></div>
+                    <div id="workPaymentContent" class="collapsible-content">
+                        <div class="admin-filter">
+                            <label><input type="radio" name="workSocietyFilter" value="all" checked onchange="filterWorkMembers()"> ሁሉም</label>
+                            <label><input type="radio" name="workSocietyFilter" value="Wazema" onchange="filterWorkMembers()"> ዋዜሜ</label>
+                            <label><input type="radio" name="workSocietyFilter" value="Planet" onchange="filterWorkMembers()"> ፕላኔት</label>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                            <select id="workMemberSelect" style="flex:2;min-width:150px;"></select>
+                            <input type="date" id="workDate" style="flex:1;">
+                            <input type="number" id="workSharesQuantity" placeholder="የአክሲዮን ብዛት" style="flex:1;">
+                            <input type="number" id="workAmount" placeholder="የገንዘብ መጠን" style="flex:1;">
+                            <input type="text" id="workBankCode" placeholder="ባንክ ኮድ" style="flex:2;min-width:150px;">
+                            <button class="btn-sm btn-success" onclick="addWorkPayment()">መዝግብ</button>
+                        </div>
+                        <div id="workPaymentListContainer" style="margin-top:15px;"></div>
+                    </div>
+                </div>
+                <div class="card"><div class="collapsible-header" onclick="toggleContributionReport()"><h3>የመዋጮ ሪፖርት እና ገበታ</h3><i id="reportIcon" class="fas fa-chevron-down"></i></div>
+                <div id="contributionReportContent" class="collapsible-content">
+                    <div id="reportTypeSelector" class="admin-filter">
+                        <label><input type="radio" name="reportDataType" value="contributions" checked onchange="onReportTypeChange()"> መዋጮ</label>
+                        <label><input type="radio" name="reportDataType" value="workPayments" onchange="onReportTypeChange()"> የስራ ማስኪጃ</label>
+                    </div>
+                    <div id="adminReportFilters" class="admin-only">
+                        <div class="admin-filter" id="memberTypeFilterRow">
+                            <label><input type="radio" name="reportMemberType" value="all" checked onchange="filterContributionReportAndChart()"> ሁሉም</label>
+                            <label><input type="radio" name="reportMemberType" value="Wazema" onchange="filterContributionReportAndChart()"> ዋዜሜ</label>
+                            <label><input type="radio" name="reportMemberType" value="Planet" onchange="filterContributionReportAndChart()"> ፕላኔት</label>
+                        </div>
+                        <div class="admin-filter" id="contributionTypeFilterRow">
+                            <label><input type="radio" name="reportContributionType" value="all" checked onchange="filterContributionReportAndChart()"> ሁሉም</label>
+                            <label><input type="radio" name="reportContributionType" value="regular" onchange="filterContributionReportAndChart()"> መደበኛ</label>
+                            <label><input type="radio" name="reportContributionType" value="special" onchange="filterContributionReportAndChart()"> ልዩ</label>
+                        </div>
+                        <div class="admin-filter" id="shareholderStatusFilterRow">
+                            <label><input type="radio" name="reportShareholderStatus" value="all" checked onchange="filterContributionReportAndChart()"> ሁሉም</label>
+                            <label><input type="radio" name="reportShareholderStatus" value="founder" onchange="filterContributionReportAndChart()"> መስራች</label>
+                            <label><input type="radio" name="reportShareholderStatus" value="buyer" onchange="filterContributionReportAndChart()"> ገዝቶ የገባ</label>
+                        </div>
+                        <select id="reportMemberSelect" onchange="filterContributionReportAndChart()"><option value="all">ሁሉም አባላት</option></select>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <input type="date" id="reportStartDate"> - <input type="date" id="reportEndDate">
+                        <button class="btn-sm" onclick="filterContributionReportAndChart()">አጣራ</button>
+                        <button class="btn-sm btn-success admin-only" onclick="exportContributionReportExcel()">Excel</button>
+                        <select id="printTypeSelect"><option value="chart">Chart</option><option value="text">Text Report</option><option value="allMembers">ሁሉም አባላት ሪፖርት</option></select>
+                        <button class="btn-sm btn-warning" onclick="printContributionReportWithType()">አትም</button>
+                    </div>
+                    <div class="chart-container"><canvas id="contributionChart"></canvas></div>
+                    <div id="reportResultsContainer" style="margin-top:15px;overflow-x:auto;"></div>
+                    <!-- DeepSeek AI Panel for Member Contribution Report (Request 4) -->
+                    <div class="ai-panel" id="memberAIPanel">
+                        <h4><i class="fas fa-robot"></i> DeepSeek AI ረዳት</h4>
+                        <p style="font-size:0.75rem;color:#555;">ስለ መዋጮዎ፣ ቀሪ ክፍያ እና ሌሎች ጥያቄዎች ይጠይቁ</p>
+                        <div class="ai-chat-box" id="memberAIChatBox">
+                            <div class="ai-message ai-bot">👋 ሰላም! ስለ መዋጮዎ፣ ቀሪ ክፍያዎ እና ሌሎች የማህበሩ ጉዳዮች መጠየቅ ይችላሉ።</div>
+                        </div>
+                        <div class="ai-typing" id="memberAITyping">DeepSeek AI እያሰበ ነው...</div>
+                        <div class="ai-input-row">
+                            <input type="text" id="memberAIQuestion" placeholder="ለምሳሌ፡ ቀሪ ክፍያዬ ስንት ነው?">
+                            <button class="btn-sm btn-success" onclick="askMemberAI()"><i class="fas fa-paper-plane"></i> ጠይቅ</button>
+                            <button class="btn-sm btn-warning" onclick="clearMemberAIChat()"><i class="fas fa-trash"></i> አጽዳ</button>
+                        </div>
+                    </div>
+                </div></div>
+                <div id="adminMemberListWrapper" class="card admin-only"><div class="collapsible-header" onclick="toggleMemberList()"><h3>የአባላት ዝርዝር</h3><i id="memberListIcon" class="fas fa-chevron-down"></i></div><div id="memberListContent" class="collapsible-content"><div class="top-buttons"><button class="btn-sm btn-success" onclick="exportSelectedMemberToExcel()"><i class="fas fa-file-excel"></i> የተመረጠውን አባል Excel</button><button class="btn-sm btn-warning" onclick="printSelectedMemberOnly()"><i class="fas fa-print"></i> አትም (ዝርዝር መዋጮ)</button><button class="btn-sm" onclick="printAllMembersFiltered()" style="background:#2c3e50;color:white;"><i class="fas fa-print"></i> የሁሉም አባላት ሪፖርት አትም</button></div><div class="admin-filter"><label><input type="radio" name="memberListFilter" value="all" checked onchange="renderMemberListTable()"> ሁሉም</label><label><input type="radio" name="memberListFilter" value="Wazema" onchange="renderMemberListTable()"> ዋዜሜ</label><label><input type="radio" name="memberListFilter" value="Planet" onchange="renderMemberListTable()"> ፕላኔት</label></div><div class="admin-filter"><label><input type="radio" name="memberStatusFilter" value="all" checked onchange="renderMemberListTable()"> ሁሉም</label><label><input type="radio" name="memberStatusFilter" value="founder" onchange="renderMemberListTable()"> መስራች</label><label><input type="radio" name="memberStatusFilter" value="buyer" onchange="renderMemberListTable()"> ገዝቶ የገባ</label></div><div class="search-box"><select id="memberSearchField"><option value="name">ስም</option><option value="id">አይዲ</option><option value="phone">ስልክ</option></select><i class="fas fa-search"></i><input type="text" id="memberSearchInput" placeholder="ፈልግ..." onkeyup="handleMemberSearchDebounced()" style="flex:1;"></div><div style="overflow-x:auto;"><table class="data-table" id="memberListTable"><thead><th>ስም</th><th>ጾታ</th><th>አድራሻ</th><th>ስልክ</th><th>መጠሪያ</th><th>አክሲዮን</th><th>የሚጠበቅ</th><th>የተከፈለ</th><th>ቀሪ</th><th>ድርጊት</th></thead><tbody id="memberListTableBody"></tbody></table></div></div></div>
+                <div id="adminMemberMgmt" class="card admin-only"><div class="collapsible-header" onclick="toggleMemberMgmt()"><h3><i class="fas fa-users-gear"></i> አባላት መመዝገቢያ</h3><i id="mgmtIcon" class="fas fa-chevron-down"></i></div><div id="memberMgmtContent" class="collapsible-content"><div class="admin-filter"><label><input type="radio" name="newMemberType" value="Wazema" checked> ዋዜሜ</label><label><input type="radio" name="newMemberType" value="Planet"> ፕላኔት</label></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"><input type="text" id="newMemberName" placeholder="ሙሉ ስም"><input type="text" id="newMemberPhone" placeholder="ስልክ"><input type="number" id="newMemberShares" placeholder="አክሲዮን" value="1"><input type="text" id="newMemberAddress" placeholder="አድራሻ"><select id="newMemberGender"><option>ወንድ</option><option>ሴት</option></select><input type="text" id="newAssociationGivenName" placeholder="የማህበሩ ስያሜ"></div><div class="admin-filter"><label><input type="radio" name="shareholderStatus" value="founder" checked onchange="togglePurchaseFields()"> መስራች</label><label><input type="radio" name="shareholderStatus" value="buyer" onchange="togglePurchaseFields()"> ገዝቶ የገባ</label></div><div id="purchaseInfoFields" style="display:none;"><input type="text" id="purchasedFrom" placeholder="ከማን ገዛ?"><input type="date" id="purchaseDate"></div><button class="btn-sm btn-success" onclick="registerMember()">አባል ይመዝገቡ</button></div></div>
+                <div id="adminSeparatedRegistration" class="card admin-only"><div class="collapsible-header" onclick="toggleSeparatedRegistration()"><h3><i class="fas fa-user-plus"></i> የተሰናበቱ አባላት መመዝገቢያ</h3><i id="separatedRegIcon" class="fas fa-chevron-down"></i></div><div id="separatedRegContent" class="collapsible-content"><h4 style="border-bottom:1px solid #ccc;padding-bottom:5px;">1. አባል ማሰናበት</h4><div class="admin-filter"><label>ንቁ አባል ምረጥ: <select id="sepMemberSelect" style="min-width:250px;" onchange="populateSepFields()"><option value="">-- አባል ይምረጡ --</option></select></label></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"><input type="text" id="sepName" placeholder="ሙሉ ስም" readonly><input type="text" id="sepGender" placeholder="ጾታ" readonly><input type="text" id="sepAddress" placeholder="አድራሻ" readonly><input type="text" id="sepPhone" placeholder="ስልክ" readonly><input type="text" id="sepAssociationGivenName" placeholder="የማህበሩ ስያሜ" readonly><input type="number" id="sepSharesOwned" placeholder="ያለው እጣ" readonly><input type="number" id="sepSavedTotal" placeholder="የቆጠበው (መዋጮ)" readonly><input type="number" id="sepBonus" placeholder="ቦነስ" value="0"><input type="date" id="sepDate"><select id="sepReason" onchange="toggleNoticeDate()"><option value="own">በራስ ፍላጎት</option><option value="association">በማህበሩ ውሳኔ</option></select><div id="noticeDateDiv" style="display:none;"><input type="date" id="sepNoticeDate" placeholder="ያመለከተበት ቀን"></div></div><button class="btn-sm btn-danger" onclick="registerSeparatedMember()" style="margin-top:10px;">ይመዝገቡ</button><h4 style="border-bottom:1px solid #ccc;padding:10px 0 5px;">2. የባንክ ስሊፕ መመዝገቢያ</h4><div class="admin-filter" style="margin-bottom:10px;"><label>የተሰናበተ አባል ምረጥ: <select id="refundSepMemberSelect" onchange="loadSepRefundTransactions()" style="min-width:200px;"><option value="">-- አባል ይምረጡ --</option></select></label></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;"><input type="date" id="sepRefundApplyDate" placeholder="ያመለከተበት ቀን"><input type="text" id="sepRefundReceiptNo" placeholder="ተ.ቁጥር"><input type="date" id="sepRefundTransferDate" placeholder="የተላለፈበት ቀን"><input type="text" id="sepRefundBankCode" placeholder="ባንክ ኮድ"><input type="number" id="sepRefundAmount" placeholder="ብር መጠን"></div><button class="btn-sm btn-success" onclick="addSepRefundTransaction()" style="margin-top:8px;">+ ስሊፕ ጨምር</button><div id="sepRefundTransactionsList" style="margin-top:10px;overflow-x:auto;"></div><div style="display:flex;gap:8px;margin-top:10px;"><button class="btn-sm btn-success" onclick="exportSepRefundToExcel()">Excel ላክ</button><button class="btn-sm btn-warning" onclick="printSepRefund()">አትም</button></div></div></div>
+                <div id="adminSeparatedList" class="card admin-only"><div class="collapsible-header" onclick="toggleSeparatedList()"><h3>የተሰናበቱ አባላት ዝርዝር</h3><i id="separatedListIcon" class="fas fa-chevron-down"></i></div><div id="separatedListContent" class="collapsible-content"><div class="admin-filter"><span>ከቀን:</span><input type="date" id="sepListStart"><span>እስከ ቀን:</span><input type="date" id="sepListEnd"><button class="btn-sm" onclick="renderSeparatedList()">አጣራ</button><button class="btn-sm btn-success" onclick="exportSeparatedToExcel()">Excel</button><button class="btn-sm btn-warning" onclick="printSeparatedList()">አትም</button></div><div id="separatedListContainer"></div></div></div>
+                <div id="adminSepStatsCard" class="card admin-only" style="background:#fef5e7;"><div class="collapsible-header" onclick="toggleSeparationStats()"><h3>የአባላት ስንብት መረጃ እና ትንተና</h3><i id="sepStatsIcon" class="fas fa-chevron-down"></i></div><div id="sepStatsContent" class="collapsible-content"><div class="admin-filter"><label><input type="radio" name="sepFilter" value="all" checked onchange="updateSeparationStats()"> ሁሉም</label><label><input type="radio" name="sepFilter" value="Wazema" onchange="updateSeparationStats()"> ዋዜሜ</label><label><input type="radio" name="sepFilter" value="Planet" onchange="updateSeparationStats()"> ፕላኔት</label><span>ከቀን:</span><input type="date" id="sepStatsStart" onchange="updateSeparationStats()"><span>እስከ:</span><input type="date" id="sepStatsEnd" onchange="updateSeparationStats()"><span>ወር:</span><input type="month" id="sepStatsMonth" onchange="updateSeparationStats()"><span>አመት:</span><input type="number" id="sepStatsYear" placeholder="አመት" onchange="updateSeparationStats()"><button class="btn-sm btn-success" onclick="exportSeparationStatsExcel()">Excel ላክ</button><button class="btn-sm btn-warning" onclick="printSeparationStats()">አትም</button></div><div><span class="stat-blue">የተሰናበቱ ብዛት: <span id="separatedCount">0</span> (ወንድ: <span id="sepMale">0</span>, ሴት: <span id="sepFemale">0</span>)</span> <span class="stat-green">ጠቅላላ አክሲዮን: <span id="separatedSharesSum">0</span></span> <span class="stat-orange">ጠቅላላ የተከፈለ: <span id="separatedTotalPaid">0</span> ብር</span> <span class="stat-blue">የተመለሰ አክሲዮን: <span id="totalReturnedShares">0</span></span> <span class="stat-green">ንቁ አባላት: <span id="activeMembersCount">0</span> (ወንድ: <span id="activeMale">0</span>, ሴት: <span id="activeFemale">0</span>)</span></div><div id="separatedAnalysisContainer" class="analysis-stats" style="margin-top:15px;"></div></div></div>
+                <div id="adminDefaultersWrapper" class="card admin-only"><div class="collapsible-header" onclick="toggleDefaulters()"><h3>ያልከፈሉ አባላት እና ትንተና</h3><i id="defaultersIcon" class="fas fa-chevron-down"></i></div><div id="defaultersContent" class="collapsible-content"><div class="admin-filter"><input type="month" id="defaulterMonth"><select id="defaulterContributionType"><option value="regular">መደበኛ</option><option value="special">ልዩ</option><option value="both">ሁለቱንም</option></select><button class="btn-sm" onclick="showDefaulters()">አሳይ</button><button class="btn-sm btn-success" onclick="exportDefaultersToExcel()">Excel ላክ</button><button class="btn-sm btn-warning" onclick="printDefaulters()">አትም</button></div><div id="defaultersResults"></div><div id="defaulterAnalysisContainer" class="analysis-stats" style="margin-top:15px;"></div></div></div>
+            </div>
+        </div>
+        <div class="footer">ኮክ ትሬዲንግ የግል ማህበር | ፖስታ ሳጥን: 897 | ስልክ: 0583203839</div>
+    </div>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyAKyR0bqOS0sDzYQI-0lNVs47adqQXO-GQ", authDomain: "town-apartment.firebaseapp.com", databaseURL: "https://town-apartment-default-rtdb.europe-west1.firebasedatabase.app", projectId: "town-apartment", storageBucket: "town-apartment.firebasestorage.app", messagingSenderId: "68597638574", appId: "1:68597638574:android:bef7bc259d66cf0f6c143f" };
+        let database, membersList = [],
+            contributions = {},
+            announcements = [],
+            currentUser = { role: "admin", memberId: null };
+        let adminMemberFilter = "all",
+            selectedMemberForPrint = null,
+            searchDebounceTimeout = null,
+            currentPurchaseCategory = "all",
+            contributionChart = null,
+            separatedMembers = [],
+            analysisChart = null,
+            workPayments = [],
+            shareTransfers = [];
+        let currentReportDataType = "contributions";
+        let materials = { iron: [], nail: [], cement: [], gravel: [], ash: [], others: [] };
+        const materialTypes = ["iron", "nail", "cement", "gravel", "ash", "others"],
+            typeLabels = { iron: "ብረት", nail: "ሚስማር", cement: "ሲሚንቶ", gravel: "ጠጠር", ash: "አሽዋ", others: "ሌሎች" };
+        let sharePrice = 200000;
+
+        // DeepSeek AI Configuration
+        const DEEPSEEK_API_KEY = "sk-b2a2fd94b5e2463c926fdc0087e91045";
+        const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+        let adminAIChatHistory = [];
+        let memberAIChatHistory = [];
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        database = firebase.database();
+
+        function formatDecimal(n) { return isNaN(n) ? "0.00" : parseFloat(n).toLocaleString(undefined, { minimumFractionDigits: 2 }); }
+
+        function generateId(t) { return (t === 'Wazema' ? 'W' : 'P') + '-' + Math.floor(1000 + Math.random() * 9000); }
+
+        function getNextReceiptNumber() { return "INV-" + String(Math.floor(Math.random() * 1000)).padStart(3, '0'); }
+
+        function getNextRefundReceipt() { return "REF-" + String(Math.floor(Math.random() * 10000)).padStart(4, '0'); }
+
+        function doPrint(content) { let area = document.getElementById('printArea');
+            area.innerHTML =
+                `<div class="watermark-text">THE TREASURE OF WAZEMA AND PLANET (KOK TRADING)</div>${content}`;
+            area.style.display = 'block';
+            window.print();
+            area.style.display = 'none'; }
+
+        function saveMembers() { database.ref('/members').set({ list: membersList });
+            renderMemberListTable();
+            updateSeparationStats();
+            updateActiveMemberDropdown();
+            updatePurchaseAnalysis();
+            updateRefundAnalysis();
+            updateFinancialSource();
+            updateSharePriceDisplay();
+            updateExpectedTotals();
+            updateWorkMemberSelect();
+            updateContributionReportMemberSelect();
+            updateWarningEncouragement(); }
+
+        function saveContributions() { database.ref('/contributions').set(contributions);
+            renderMemberListTable();
+            updateStats();
+            updateSeparationStats();
+            updateRefundAnalysis();
+            updateFinancialSource();
+            updateExpectedTotals();
+            updateMemberStatusMessage();
+            updateWarningEncouragement(); }
+
+        function saveConstruction() { database.ref('/construction').set(materials);
+            renderConstructionSummary();
+            updatePurchaseAnalysis();
+            updateFinancialSource(); }
+
+        function saveSeparatedMembers() { database.ref('/separatedMembers').set(separatedMembers);
+            updateSeparationStats();
+            renderSeparatedList();
+            updateRefundAnalysis();
+            updateFinancialSource();
+            updateSepRefundSelect();
+            updateWorkMemberSelect();
+            updateContributionReportMemberSelect();
+            updateWarningEncouragement(); }
+
+        function saveAnnouncements() { database.ref('/announcements').set(announcements);
+            updateAnnounceUI(); }
+
+        function saveSharePrice() { database.ref('/settings/sharePrice').set(sharePrice);
+            updateSharePriceDisplay();
+            updateExpectedTotals();
+            updateMemberStatusMessage();
+            updateWarningEncouragement(); }
+
+        function saveWorkPayments() { database.ref('/workPayments').set(workPayments);
+            renderWorkPaymentList(); if (document.getElementById('contributionReportContent').classList.contains('show') &&
+                currentReportDataType === 'workPayments') { filterContributionReportAndChart(); }
+            updateFinancialSource(); }
+
+        function saveShareTransfers() { database.ref('/shareTransfers').set(shareTransfers);
+            renderShareTransferList();
+            updateFinancialSource(); }
+
+        // ==================== WARNING & ENCOURAGEMENT FUNCTIONS (Request 1) ====================
+        function updateWarningEncouragement() {
+            if (currentUser.role !== 'admin') return;
+            let allMembers = [...membersList];
+            let fullyPaid = [];
+            let notFullyPaid = [];
+            let totalExpectedAll = 0;
+            let totalPaidAll = 0;
+            let totalRemainingAll = 0;
+
+            allMembers.forEach(m => {
+                let expected = getExpectedTotalForMember(m);
+                let paid = getPaidTotalForMember(m.id);
+                let remaining = expected - paid;
+                totalExpectedAll += expected;
+                totalPaidAll += paid;
+                totalRemainingAll += Math.max(0, remaining);
+                if (remaining <= 0) {
+                    fullyPaid.push({ ...m, expected, paid, remaining: 0 });
+                } else {
+                    notFullyPaid.push({ ...m, expected, paid, remaining });
+                }
+            });
+
+            // Update warning marquee
+            let warningText = '';
+            if (notFullyPaid.length > 0) {
+                let names = notFullyPaid.map(m => m.name + '(' + formatDecimal(m.remaining) + ' ብር ቀሪ)').join(' | ');
+                warningText = '⚠️ ያንተ እኩል አለመክፈል ሙሉ የከፈሉትን ይጎዳል እና ክፈል!!! ቀሪ ያላቸው: ' + names +
+                    ' ⚠️ ያንተ እኩል አለመክፈል ሙሉ የከፈሉትን ይጎዳል እና ክፈል!!!';
+            } else {
+                warningText = '🎉 ሁሉም አባላት ሙሉ ክፍያ ፈጽመዋል! ምስጋና!';
+            }
+            document.getElementById('warningMarqueeText').innerText = warningText;
+
+            // Update encouragement marquee
+            let encText = '';
+            if (fullyPaid.length > 0) {
+                let fNames = fullyPaid.map(m => m.name).join(' | ');
+                encText = '✅ ሙሉ ክፍያ የፈጸሙ አባላት (' + fullyPaid.length + ' ሰዎች): ' + fNames +
+                    ' ✅ ከፍ ያለ ምስጋና ይገባቸዋል!';
+            } else {
+                encText = '✅ እስካሁን ማንም ሙሉ ክፍያ አልፈጸመም፤ ሁሉም እንዲከፍል እናበረታታለን!';
+            }
+            document.getElementById('encouragementMarqueeText').innerText = encText;
+
+            // Update summary grid
+            let wazemaMembers = allMembers.filter(m => m.membershipType === 'Wazema');
+            let planetMembers = allMembers.filter(m => m.membershipType === 'Planet');
+            let wazemaFullyPaid = wazemaMembers.filter(m => getRemainingForMember(m) <= 0).length;
+            let planetFullyPaid = planetMembers.filter(m => getRemainingForMember(m) <= 0).length;
+            let wazemaRemaining = wazemaMembers.reduce((s, m) => s + getRemainingForMember(m), 0);
+            let planetRemaining = planetMembers.reduce((s, m) => s + getRemainingForMember(m), 0);
+
+            document.getElementById('warningSummaryGrid').innerHTML = `
+            <div class="warning-summary-item"><div class="warn-num warn-green">${fullyPaid.length}</div><small>ሙሉ ክፍያ የፈጸሙ</small></div>
+            <div class="warning-summary-item"><div class="warn-num warn-red">${notFullyPaid.length}</div><small>ቀሪ ክፍያ ያላቸው</small></div>
+            <div class="warning-summary-item"><div class="warn-num warn-green">${formatDecimal(totalPaidAll)}</div><small>ጠቅላላ የተከፈለ (ብር)</small></div>
+            <div class="warning-summary-item"><div class="warn-num warn-red">${formatDecimal(totalRemainingAll)}</div><small>ጠቅላላ ቀሪ ክፍያ (ብር)</small></div>
+            <div class="warning-summary-item"><div class="warn-num">${wazemaFullyPaid}/${wazemaMembers.length}</div><small>ዋዜማ ሙሉ/ድምር</small></div>
+            <div class="warning-summary-item"><div class="warn-num">${planetFullyPaid}/${planetMembers.length}</div><small>ፕላኔት ሙሉ/ድምር</small></div>
+            <div class="warning-summary-item"><div class="warn-num warn-orange">${formatDecimal(wazemaRemaining)}</div><small>ዋዜማ ቀሪ (ብር)</small></div>
+            <div class="warning-summary-item"><div class="warn-num warn-orange">${formatDecimal(planetRemaining)}</div><small>ፕላኔት ቀሪ (ብር)</small></div>`;
+
+            // Update detail table
+            let detailHtml =
+                `<table class="data-table"><thead><th>ስም</th><th>አይዲ</th><th>ማህበር</th><th>አክሲዮን</th><th>የሚጠበቅ</th><th>የተከፈለ</th><th>ቀሪ</th><th>ሁኔታ</th></thead><tbody>`;
+            let sortedMembers = [...allMembers].sort((a, b) => getRemainingForMember(b) - getRemainingForMember(a));
+            sortedMembers.forEach(m => {
+                let expected = getExpectedTotalForMember(m);
+                let paid = getPaidTotalForMember(m.id);
+                let remaining = expected - paid;
+                let statusBadge = remaining <= 0 ?
+                    '<span style="color:#006600;font-weight:bold;">✅ ሙሉ ክፍያ</span>' :
+                    '<span style="color:#cc0000;font-weight:bold;">⚠️ ቀሪ ' + formatDecimal(remaining) +
+                    ' ብር</span>';
+                detailHtml +=
+                    `<tr><td class="green-bold">${m.name}</td><td class="green-bold">${m.id}</td><td class="green-bold">${m.membershipType}</td><td>${m.shares}</td><td class="green-bold">${formatDecimal(expected)}</td><td class="green-bold">${formatDecimal(paid)}</td><td class="green-bold">${formatDecimal(Math.max(0,remaining))}</td><td>${statusBadge}</td></tr>`;
+            });
+            detailHtml += `</tbody></table>`;
+            document.getElementById('warningDetailTable').innerHTML = detailHtml;
+        }
+
+        function toggleWarningEncouragement() {
+            let c = document.getElementById('warningEncouragementContent');
+            c.classList.toggle('show');
+            if (c.classList.contains('show')) updateWarningEncouragement();
+        }
+
+        // ==================== DEEPSEEK AI FUNCTIONS (Requests 3 & 4) ====================
+        async function callDeepSeekAI(messages, isAdmin = true) {
+            try {
+                let typingEl = isAdmin ? document.getElementById('adminAITyping') : document.getElementById('memberAITyping');
+                typingEl.classList.add('show');
+                let response = await fetch(DEEPSEEK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + DEEPSEEK_API_KEY
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: messages,
+                        max_tokens: 1500,
+                        temperature: 0.7
+                    })
+                });
+                typingEl.classList.remove('show');
+                if (!response.ok) {
+                    let errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error?.message || 'API ስህተት ' + response.status);
+                }
+                let data = await response.json();
+                return data.choices[0].message.content;
+            } catch (e) {
+                console.error('DeepSeek AI Error:', e);
+                return 'ይቅርታ፤ AI ምላሽ መስጠት አልቻለም። ስህተት: ' + e.message;
+            }
+        }
+
+        function buildAdminAIContext() {
+            let totalMembers = membersList.length;
+            let totalContrib = 0;
+            for (let mid in contributions) contributions[mid].forEach(c => totalContrib += c.amount);
+            let totalConst = calculateTotalCost();
+            let totalRefund = separatedMembers.reduce((s, sep) => s + ((sep.savedTotal || 0) + (sep.bonus || 0)), 0);
+            let totalWork = workPayments.reduce((s, wp) => s + wp.amount, 0);
+            let wazemaCount = membersList.filter(m => m.membershipType === 'Wazema').length;
+            let planetCount = membersList.filter(m => m.membershipType === 'Planet').length;
+            let fullyPaid = membersList.filter(m => getRemainingForMember(m) <= 0).length;
+            let notFullyPaid = totalMembers - fullyPaid;
+            let totalRemainingAll = membersList.reduce((s, m) => s + Math.max(0, getRemainingForMember(m)), 0);
+            let sepCount = separatedMembers.length;
+
+            return `የዋዜማ እና ፕላኔት አፓርትመንት ማህበር አስተዳደር ስርዓት መረጃ፦
+        - ጠቅላላ አባላት: ${totalMembers} (ዋዜማ: ${wazemaCount}, ፕላኔት: ${planetCount})
+        - የአንድ አክሲዮን ዋጋ: ${sharePrice.toLocaleString()} ብር
+        - ጠቅላላ መዋጮ: ${totalContrib.toLocaleString()} ብር
+        - ጠቅላላ የግንባታ ወጪ: ${totalConst.toLocaleString()} ብር
+        - ለተሰናበቱ የተመለሰ: ${totalRefund.toLocaleString()} ብር
+        - የስራ ማስኪጃ ክፍያ: ${totalWork.toLocaleString()} ብር
+        - ሙሉ ክፍያ የፈጸሙ: ${fullyPaid} አባላት
+        - ቀሪ ክፍያ ያላቸው: ${notFullyPaid} አባላት
+        - ጠቅላላ ቀሪ ክፍያ: ${totalRemainingAll.toLocaleString()} ብር
+        - የተሰናበቱ አባላት: ${sepCount}
+        - ቀሪ ገንዘብ (መዋጮ - ወጪ - ተመላሽ - ማስኪጃ): ${(totalContrib - totalConst - totalRefund - totalWork).toLocaleString()} ብር`;
+        }
+
+        function buildMemberAIContext() {
+            if (currentUser.role !== 'member' || !currentUser.memberId) return '';
+            let member = membersList.find(m => m.id === currentUser.memberId);
+            if (!member) return '';
+            let expected = getExpectedTotalForMember(member);
+            let paid = getPaidTotalForMember(member.id);
+            let remaining = expected - paid;
+            let regularTotal = (contributions[member.id] || []).filter(c => c.type === 'regular').reduce((s, c) => s + c.amount,
+                0);
+            let specialTotal = (contributions[member.id] || []).filter(c => c.type === 'special').reduce((s, c) => s + c.amount,
+                0);
+            let workTotal = workPayments.filter(wp => wp.memberId === member.id).reduce((s, wp) => s + wp.amount, 0);
+
+            return `የአባል መረጃ፦
+        - ስም: ${member.name}
+        - ኮድ: ${member.id}
+        - ማህበር: ${member.membershipType === 'Wazema' ? 'ዋዜማ' : 'ፕላኔት'}
+        - ባለቤትነት: ${member.shareholderStatus === 'founder' ? 'መስራች' : 'ገዝቶ የገባ'}
+        - አክሲዮን ብዛት: ${member.shares}
+        - የአንድ አክሲዮን ዋጋ: ${sharePrice.toLocaleString()} ብር
+        - የሚጠበቅ ጠቅላላ ክፍያ: ${formatDecimal(expected)} ብር
+        - የተከፈለ ጠቅላላ: ${formatDecimal(paid)} ብር (መደበኛ: ${formatDecimal(regularTotal)} ብር, ልዩ: ${formatDecimal(specialTotal)} ብር)
+        - ቀሪ ክፍያ: ${formatDecimal(Math.max(0,remaining))} ብር
+        - የስራ ማስኪጃ የተከፈለ: ${formatDecimal(workTotal)} ብር
+        - ስልክ: ${member.phone}
+        - አድራሻ: ${member.address}`;
+        }
+
+        async function askAdminAI() {
+            let question = document.getElementById('adminAIQuestion').value.trim();
+            if (!question) return;
+            let chatBox = document.getElementById('adminAIChatBox');
+            chatBox.innerHTML +=
+                `<div class="ai-message ai-user">${question.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+            document.getElementById('adminAIQuestion').value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            let context = buildAdminAIContext();
+            adminAIChatHistory.push({ role: 'user', content: question });
+            let messages = [
+                { role: 'system', content: 'አንተ የዋዜማ እና ፕላኔት አፓርትመንት ማህበር አስተዳደር AI ረዳት ነህ። በአማርኛ መልስ ስጥ። ከዚህ በታች ያለውን የማህበሩን መረጃ ተጠቀም።\n\n' +
+                    context
+                },
+                ...adminAIChatHistory.slice(-8)
+            ];
+
+            let answer = await callDeepSeekAI(messages, true);
+            adminAIChatHistory.push({ role: 'assistant', content: answer });
+            chatBox.innerHTML +=
+                `<div class="ai-message ai-bot">${answer.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            if (adminAIChatHistory.length > 20) adminAIChatHistory = adminAIChatHistory.slice(-10);
+        }
+
+        async function askMemberAI() {
+            let question = document.getElementById('memberAIQuestion').value.trim();
+            if (!question) return;
+            let chatBox = document.getElementById('memberAIChatBox');
+            chatBox.innerHTML +=
+                `<div class="ai-message ai-user">${question.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+            document.getElementById('memberAIQuestion').value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            let context = buildMemberAIContext();
+            memberAIChatHistory.push({ role: 'user', content: question });
+            let messages = [
+                { role: 'system', content: 'አንተ የዋዜማ እና ፕላኔት አፓርትመንት ማህበር አባል አገልግሎት AI ረዳት ነህ። በአማርኛ መልስ ስጥ። ከዚህ በታች ያለውን የአባሉን መረጃ ተጠቀም።\n\n' +
+                    context
+                },
+                ...memberAIChatHistory.slice(-8)
+            ];
+
+            let answer = await callDeepSeekAI(messages, false);
+            memberAIChatHistory.push({ role: 'assistant', content: answer });
+            chatBox.innerHTML +=
+                `<div class="ai-message ai-bot">${answer.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            if (memberAIChatHistory.length > 20) memberAIChatHistory = memberAIChatHistory.slice(-10);
+        }
+
+        function clearAdminAIChat() {
+            adminAIChatHistory = [];
+            document.getElementById('adminAIChatBox').innerHTML =
+                '<div class="ai-message ai-bot">👋 ሰላም! ስለ ማህበሩ አጠቃላይ መረጃ፣ የአባላት ሁኔታ፣ የመዋጮ ሪፖርት፣ የግንባታ ወጪ እና ሌሎችም መጠየቅ ይችላሉ።</div>';
+        }
+
+        function clearMemberAIChat() {
+            memberAIChatHistory = [];
+            document.getElementById('memberAIChatBox').innerHTML =
+                '<div class="ai-message ai-bot">👋 ሰላም! ስለ መዋጮዎ፣ ቀሪ ክፍያዎ እና ሌሎች የማህበሩ ጉዳዮች መጠየቅ ይችላሉ።</div>';
+        }
+
+        // Enter key support for AI inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                let adminInput = document.getElementById('adminAIQuestion');
+                let memberInput = document.getElementById('memberAIQuestion');
+                if (adminInput) adminInput.addEventListener('keydown', function(e) { if (e.key === 'Enter')
+                        askAdminAI(); });
+                if (memberInput) memberInput.addEventListener('keydown', function(e) { if (e.key === 'Enter')
+                        askMemberAI(); });
+            }, 2000);
+        });
+
+        async function loadSharePrice() { try { let snap = await database.ref('/settings/sharePrice').once('value'); if (
+                snap.exists()) sharePrice = snap.val(); else { sharePrice = 200000;
+                saveSharePrice(); } } catch (e) { console.warn("Share price load failed", e);
+                sharePrice = 200000;
+                saveSharePrice(); }
+            updateSharePriceDisplay();
+            updateExpectedTotals(); }
+
+        function updateSharePrice() { let newPrice = parseFloat(document.getElementById('sharePriceInput').value); if (!isNaN(
+                newPrice) && newPrice > 0) { sharePrice = newPrice;
+                saveSharePrice();
+                updateExpectedTotals();
+                renderMemberListTable();
+                updateMemberStatusMessage();
+                updateWarningEncouragement();
+                alert("የአክሲዮን ዋጋ ተሻሽሏል"); } else alert("ትክክለኛ ቁጥር ያስገቡ"); }
+
+        function updateSharePriceDisplay() { document.getElementById('sharePriceDisplay').innerText =
+                `የአንድ አክሲዮን ዋጋ: ${formatDecimal(sharePrice)} ብር`;
+            document.getElementById('sharePriceInput').value = sharePrice; }
+
+        function getExpectedTotalForMember(member) { return (member.shares || 0) * sharePrice; }
+
+        function getPaidTotalForMember(memberId) { return (contributions[memberId] || []).reduce((s, c) => s + c.amount, 0); }
+
+        function getRemainingForMember(member) { let expected = getExpectedTotalForMember(member); let paid =
+                getPaidTotalForMember(member.id); return Math.max(0, expected - paid); }
+
+        function updateExpectedTotals() { let totalExpected = membersList.reduce((s, m) => s + getExpectedTotalForMember(m),
+                0); let totalPaid = 0; for (let mid in contributions) totalPaid += contributions[mid].reduce((s, c) => s + c
+                .amount, 0); let totalRemaining = totalExpected - totalPaid;
+            document.getElementById('totalExpected').innerText = formatDecimal(totalExpected);
+            document.getElementById('totalRemaining').innerText = formatDecimal(totalRemaining); }
+
+        function updateMemberStatusMessage() {
+            if (currentUser.role !== 'member') { document.getElementById('memberStatusMessage').style.display = 'none'; return; }
+            let member = membersList.find(m => m.id === currentUser.memberId); if (!member) { document.getElementById(
+                    'memberStatusMessage').style.display = 'none'; return; }
+            let remaining = getRemainingForMember(member);
+            let msgDiv = document.getElementById('memberStatusMessage');
+            let textSpan = document.getElementById('memberStatusText');
+            msgDiv.style.display = 'block'; if (remaining > 0) { msgDiv.className =
+                    "status-message status-warning status-scroll";
+                textSpan.innerHTML =
+                    `⚠️ እኩል አለመክፈል ሙሉ የከፈሉትን ይጎዳል እና ክፈል!!! ቀሪ ክፍያ: ${formatDecimal(remaining)} ብር&nbsp;&nbsp;&nbsp;&nbsp;⚠️ እኩል አለመክፈል ሙሉ የከፈሉትን ይጎዳል እና ክፈል!!! ቀሪ ክፍያ: ${formatDecimal(remaining)} ብር`; } else {
+                msgDiv.className = "status-message status-success status-scroll";
+                textSpan.innerHTML =
+                    `✅ የታሰበው አፓርትመንት እውን የሚያደርገው በመጀመሪያ የሚጠበቅብንን ስንከፍል በመሆኑ እርስዎም ይህን ስላደረጉ ከፍ ያለ ምስጋና ይገባዎታል! ✅&nbsp;&nbsp;&nbsp;&nbsp;✅ የታሰበው አፓርትመንት እውን የሚያደርገው በመጀመሪያ የሚጠበቅብንን ስንከፍል በመሆኑ እርስዎም ይህን ስላደረጉ ከፍ ያለ ምስጋና ይገባዎታል! ✅`; }
+        }
+
+        // ---------- SHARE TRANSFER FUNCTIONS ----------
+        function toggleShareTransferCard() { let c = document.getElementById('shareTransferCardContent'),
+                i = document.getElementById('shareTransferCardIcon');
+            c.classList.toggle('show');
+            i.classList.toggle('fa-chevron-down');
+            i.classList.toggle('fa-chevron-up'); if (c.classList.contains('show')) { document.getElementById('stTransferDate')
+                    .value = new Date().toISOString().slice(0, 10);
+                renderShareTransferList(); } }
+
+        function toggleSTPurchaseFields() { let entryType = document.getElementById('stEntryType').value;
+            document.getElementById('stPurchaseInfoFields').style.display = entryType === 'buyer' ? 'block' : 'none'; }
+
+        function addSTAdditionalPurchase() { let container = document.getElementById('stAdditionalPurchases'); let count =
+                container.querySelectorAll('.purchase-entry').length + 1; let div = document.createElement('div');
+            div.className = 'purchase-entry';
+            div.innerHTML = `
+            <h5>${count+1}/ ከማን ገዛው</h5>
+            <div class="share-transfer-grid">
+                <input type="text" class="st-add-from" placeholder="ከማን ገዛ - ስም">
+                <input type="number" class="st-add-shares" placeholder="የተላለፈለት እጣ ብዛት" value="0">
+                <input type="number" class="st-add-amount" placeholder="የተላለፈለት የገንዘብ መጠን" value="0">
+            </div>
+            <button class="btn-sm btn-danger" onclick="this.parentElement.remove()" style="margin-top:4px;">ሰርዝ</button>`;
+            container.appendChild(div); }
+
+        function saveShareTransfer() { if (currentUser.role !== 'admin') return; let entryType = document.getElementById(
+                'stEntryType').value; let transferorName = document.getElementById('stTransferorName').value.trim(); if (!
+                transferorName) return alert("የአስተላላፊ ስም ያስገቡ"); let transferDate = document.getElementById('stTransferDate')
+                .value; if (!transferDate) return alert("የተላለፈበት ቀን ያስገቡ"); let record = { id: "ST-" + String(Math.floor(
+                        Math.random() * 10000)).padStart(4, '0'), date: transferDate, association: document.getElementById(
+                        'stAssociation').value, entryType: entryType, transferorName: transferorName, transferorGender: document
+                    .getElementById('stTransferorGender').value, transferorPhone: document.getElementById('stTransferorPhone')
+                    .value.trim(), transferorShares: parseInt(document.getElementById('stTransferorShares').value) || 0,
+                    sharesToTransfer: parseInt(document.getElementById('stSharesToTransfer').value) || 0,
+                    transferorSavedAmount: parseFloat(document.getElementById('stTransferorSaved').value) || 0,
+                    transferAmount: parseFloat(document.getElementById('stTransferAmount').value) || 0, witnesses: [(
+                            document.getElementById('stWitnessTitle1').value.trim() + ' ' + document.getElementById(
+                                'stWitness1').value.trim()).trim(), (document.getElementById('stWitnessTitle2').value
+                            .trim() + ' ' + document.getElementById('stWitness2').value.trim()).trim(), (document
+                            .getElementById('stWitnessTitle3').value.trim() + ' ' + document.getElementById('stWitness3')
+                            .value.trim()).trim()].filter(w => w.length > 1), purchasedFrom: '', purchasedShares: 0,
+                    purchasedAmount: 0, additionalPurchases: [] }; if (entryType === 'buyer') { record.purchasedFrom =
+                    document.getElementById('stPurchasedFrom').value.trim();
+                record.purchasedShares = parseInt(document.getElementById('stPurchasedShares').value) || 0;
+                record.purchasedAmount = parseFloat(document.getElementById('stPurchasedAmount').value) || 0; let addDivs =
+                    document.querySelectorAll('#stAdditionalPurchases .purchase-entry');
+                addDivs.forEach(div => { let fromEl = div.querySelector('.st-add-from'); let sharesEl = div.querySelector(
+                        '.st-add-shares'); let amountEl = div.querySelector('.st-add-amount'); if (fromEl && sharesEl &&
+                        amountEl) { record.additionalPurchases.push({ from: fromEl.value.trim(), shares: parseInt(sharesEl
+                                .value) || 0, amount: parseFloat(amountEl.value) || 0 }); } });
+                record.totalTransferredAmount = record.purchasedAmount + record.additionalPurchases.reduce((s, a) => s + (a
+                    .amount || 0), 0); } else { record.totalTransferredAmount = record.transferAmount; }
+            shareTransfers.push(record);
+            saveShareTransfers();
+            alert("የአክሲዮን ማስተላለፊያ ተመዝግቧል!");
+            clearShareTransferForm(); }
+
+        function clearShareTransferForm() { ['stTransferorName', 'stTransferorPhone', 'stTransferorShares',
+                'stSharesToTransfer', 'stTransferorSaved', 'stTransferAmount', 'stWitness1', 'stWitness2', 'stWitness3',
+                'stWitnessTitle1', 'stWitnessTitle2', 'stWitnessTitle3', 'stPurchasedFrom', 'stPurchasedShares',
+                'stPurchasedAmount'
+            ].forEach(id => { let el = document.getElementById(id); if (el) el.value = el.type === 'number' ? '0' : ''; });
+            document.getElementById('stAdditionalPurchases').innerHTML = '';
+            document.getElementById('stTransferDate').value = new Date().toISOString().slice(0, 10); }
+
+        function renderShareTransferList() { let container = document.getElementById('shareTransferListContainer'); if (!
+                container) return; if (shareTransfers.length === 0) { container.innerHTML =
+                    '<p>ምንም የተመዘገበ የአክሲዮን ማስተላለፊያ የለም</p>'; return; } let html =
+                `<table class="data-table"><thead><th>ምረጥ</th><th>ቀን</th><th>ማህበር</th><th>አይነት</th><th>አስተላላፊ</th><th>የሚተላለፍ እጣ</th><th>የተላለፈ ገንዘብ</th><th>ድርጊት</th></thead><tbody>`;
+            shareTransfers.forEach((st, idx) => { html +=
+                    `<tr><td><input type="checkbox" class="st-check" data-idx="${idx}"></td><td class="green-bold">${st.date}</td><td class="green-bold">${st.association}</td><td class="green-bold">${st.entryType==='founder'?'መስራች':'ገዝቶ የገባ'}</td><td class="green-bold">${st.transferorName}</td><td class="green-bold">${st.sharesToTransfer}</td><td class="green-bold">${(st.totalTransferredAmount||0).toLocaleString()} ብር</td><td><button class="btn-sm btn-warning" onclick="printSingleShareTransfer(${idx})">አትም</button> <button class="btn-sm btn-danger" onclick="deleteShareTransfer(${idx})">ሰርዝ</button></td></tr>`; });
+            html += `</tbody></table>`;
+            container.innerHTML = html; }
+
+        function deleteShareTransfer(idx) { if (!confirm("ማጥፋት?")) return;
+            shareTransfers.splice(idx, 1);
+            saveShareTransfers(); }
+
+        function getSelectedShareTransfers() { let checks = document.querySelectorAll('.st-check:checked'); return Array.from(
+            checks).map(cb => shareTransfers[parseInt(cb.getAttribute('data-idx'))]).filter(Boolean); }
+
+        function printSingleShareTransfer(idx) { printShareTransferRecord(shareTransfers[idx]); }
+
+        function printShareTransferRecord(st) { if (!st) return; let html =
+                `<div class="print-header"><h2>የአክሲዮን ማስተላለፊያ ፎርም</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px;">
+        <div><strong>ቀን:</strong> ${st.date}</div><div><strong>ማህበር:</strong> ${st.association}</div>
+        <div><strong>አይነት:</strong> ${st.entryType==='founder'?'መስራች':'ገዝቶ የገባ'}</div>
+        <div><strong>የአስተላላፊ ስም:</strong> ${st.transferorName}</div><div><strong>ጾታ:</strong> ${st.transferorGender}</div>
+        <div><strong>ስልክ:</strong> ${st.transferorPhone}</div><div><strong>ያለው እጣ:</strong> ${st.transferorShares}</div>
+        <div><strong>የሚተላለፍ እጣ:</strong> ${st.sharesToTransfer}</div><div><strong>የቆጠበው ብር:</strong> ${(st.transferorSavedAmount||0).toLocaleString()}</div>
+        <div><strong>የሚተላለፍ ገንዘብ:</strong> ${(st.transferAmount||0).toLocaleString()} ብር</div></div>`; if (st.witnesses && st
+                .witnesses.length > 0) { html +=
+                `<div style="margin-bottom:10px;"><strong>የነበሩ እማኞች:</strong><br>`;
+                st.witnesses.forEach((w, i) => { if (w) html += `${i+1}/ ${w}<br>`; });
+                html += `</div>`; } if (st.entryType === 'buyer') { html +=
+                    `<div style="border:1px solid #ff9800;padding:10px;margin:10px 0;"><h4>የግዢ መረጃ</h4><div><strong>1/ ከ:</strong> ${st.purchasedFrom} | እጣ: ${st.purchasedShares} | ገንዘብ: ${(st.purchasedAmount||0).toLocaleString()} ብር</div>`;
+                if (st.additionalPurchases && st.additionalPurchases.length > 0) { st.additionalPurchases.forEach((ap, i) => {
+                        html +=
+                            `<div><strong>${i+2}/ ከ:</strong> ${ap.from} | እጣ: ${ap.shares} | ገንዘብ: ${(ap.amount||0).toLocaleString()} ብር</div>`; }); }
+                html +=
+                    `<div><strong>ጠቅላላ የተላለፈ ብር:</strong> ${(st.totalTransferredAmount||0).toLocaleString()} ብር</div></div>`; }
+            doPrint(html); }
+
+        function printAllShareTransfers() { if (shareTransfers.length === 0) return alert("ምንም ውሂብ የለም"); let html =
+                `<div class="print-header"><h2>ሁሉም የአክሲዮን ማስተላለፊያ ሪፖርት</h2></div>`;
+            shareTransfers.forEach((st, i) => { html +=
+                    `<div style="page-break-before:${i>0?'always':'auto'};margin-bottom:20px;">${generateSTPrintHTML(st,i+1)}</div>`; });
+            doPrint(html); }
+
+        function printSelectedShareTransfers() { let selected = getSelectedShareTransfers(); if (selected.length === 0) return alert(
+                "እባክዎ ቢያንስ አንድ ይምረጡ"); let html =
+            `<div class="print-header"><h2>የተመረጡ የአክሲዮን ማስተላለፊያ ሪፖርት</h2></div>`;
+            selected.forEach((st, i) => { html +=
+                    `<div style="page-break-before:${i>0?'always':'auto'};margin-bottom:20px;">${generateSTPrintHTML(st,i+1)}</div>`; });
+            doPrint(html); }
+
+        function generateSTPrintHTML(st, num) { let h =
+                `<h3>#${num} - ${st.date} (${st.association})</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;">
+        <div><b>አስተላላፊ:</b> ${st.transferorName}</div><div><b>ጾታ:</b> ${st.transferorGender}</div><div><b>ስልክ:</b> ${st.transferorPhone}</div><div><b>የሚተላለፍ እጣ:</b> ${st.sharesToTransfer}</div><div><b>የተላለፈ ገንዘብ:</b> ${(st.totalTransferredAmount||0).toLocaleString()} ብር</div></div>`;
+            if (st.entryType === 'buyer' && st.purchasedFrom) h +=
+                `<div style="font-size:12px;"><b>ከገዛው:</b> ${st.purchasedFrom} (እጣ: ${st.purchasedShares})</div>`;
+            return h; }
+
+        function exportShareTransfersToExcel() { if (shareTransfers.length === 0) return alert("ምንም ውሂብ የለም"); let wsData = [
+                ["ቀን", "ማህበር", "አይነት", "አስተላላፊ ስም", "ጾታ", "ስልክ", "ያለው እጣ", "የሚተላለፍ እጣ", "የቆጠበው ብር",
+                    "የተላለፈ ገንዘብ", "እማኞች", "ከገዛው", "የተላለፈለት እጣ", "የተላለፈለት ገንዘብ"
+                ]
+            ];
+            shareTransfers.forEach(st => { let witnesses = (st.witnesses || []).join(' | ');
+                wsData.push([st.date, st.association, st.entryType === 'founder' ? 'መስራች' : 'ገዝቶ የገባ',
+                    st.transferorName, st.transferorGender, st.transferorPhone, st.transferorShares, st
+                    .sharesToTransfer, st.transferorSavedAmount || 0, st.totalTransferredAmount || 0, witnesses,
+                    st.purchasedFrom || '-', st.purchasedShares || 0, st.purchasedAmount || 0
+                ]); if (st.additionalPurchases && st.additionalPurchases.length > 0) { st.additionalPurchases.forEach(
+                        ap => { wsData.push(['', '', '', '', '', '', '', '', '', '', '', ap.from, ap.shares, ap
+                                .amount || 0
+                            ]); }); } }); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "Share Transfers");
+            XLSX.writeFile(wb, `share_transfers_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        // Separated Refund Slip functions
+        function updateSepRefundSelect() { let select = document.getElementById('refundSepMemberSelect'); if (!select) return;
+            select.innerHTML = '<option value="">-- አባል ይምረጡ --</option>' + separatedMembers.map(s =>
+                `<option value="${s.memberId}">${s.name} (${s.membershipType})</option>`).join(''); }
+
+        function loadSepRefundTransactions() { let memberId = document.getElementById('refundSepMemberSelect').value; if (!
+                memberId) { document.getElementById('sepRefundTransactionsList').innerHTML = ''; return; } let member =
+                separatedMembers.find(s => s.memberId === memberId); if (!member) return; let refunds = member.refunds || []; let
+                html =
+                `<table class="data-table"><thead><th>ያመለከተበት ቀን</th><th>ተ.ቁጥር</th><th>የተላለፈበት ቀን</th><th>ባንክ ኮድ</th><th>መጠን</th><th>ድርጊት</th></thead><tbody>`;
+            refunds.forEach((r, idx) => { html +=
+                    `<tr><td class="green-bold">${r.applyDate}</td><td class="green-bold">${r.receiptNo}</td><td class="green-bold">${r.transferDate}</td><td class="green-bold">${r.bankCode}</td><td class="green-bold">${r.amount.toLocaleString()} ብር</td><td><button class="btn-sm btn-danger" onclick="deleteSepRefundTransaction('${memberId}',${idx})">ሰርዝ</button></td></tr>`; });
+            html += `</tbody></table>`;
+            document.getElementById('sepRefundTransactionsList').innerHTML = html; }
+
+        function addSepRefundTransaction() { let memberId = document.getElementById('refundSepMemberSelect').value; if (!
+                memberId) return alert("እባክዎ የተሰናበተ አባል ይምረጡ"); let applyDate = document.getElementById('sepRefundApplyDate')
+                .value; let receiptNo = document.getElementById('sepRefundReceiptNo').value || getNextRefundReceipt(); let
+                transferDate = document.getElementById('sepRefundTransferDate').value; let bankCode = document.getElementById(
+                    'sepRefundBankCode').value; let amount = parseFloat(document.getElementById('sepRefundAmount').value); if (!
+                    applyDate || !transferDate || !bankCode || isNaN(amount) || amount <= 0) return alert(
+                    "ሁሉንም መስኮች በትክክል ይሙሉ"); let member = separatedMembers.find(s => s.memberId === memberId); if (!member)
+                return; if (!member.refunds) member.refunds = [];
+            member.refunds.push({ applyDate, receiptNo, transferDate, bankCode, amount });
+            saveSeparatedMembers();
+            loadSepRefundTransactions();
+            alert("ስሊፕ ተመዝግቧል");
+            document.getElementById('sepRefundApplyDate').value = '';
+            document.getElementById('sepRefundReceiptNo').value = '';
+            document.getElementById('sepRefundTransferDate').value = '';
+            document.getElementById('sepRefundBankCode').value = '';
+            document.getElementById('sepRefundAmount').value = ''; }
+
+        function deleteSepRefundTransaction(memberId, idx) { if (!confirm("ማጥፋት?")) return; let member = separatedMembers.find(
+                s => s.memberId === memberId); if (member && member.refunds) { member.refunds.splice(idx, 1);
+                saveSeparatedMembers();
+                loadSepRefundTransactions(); } }
+
+        function exportSepRefundToExcel() { let memberId = document.getElementById('refundSepMemberSelect').value; if (!memberId)
+            return alert("አባል ይምረጡ"); let member = separatedMembers.find(s => s.memberId === memberId); if (!member) return; let
+            refunds = member.refunds || []; let wsData = [
+                ["ያመለከተበት ቀን", "ተ.ቁጥር", "የተላለፈበት ቀን", "ባንክ ኮድ", "መጠን"]
+            ];
+            refunds.forEach(r => wsData.push([r.applyDate, r.receiptNo, r.transferDate, r.bankCode, r.amount])); let wb = XLSX
+                .utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "Refund");
+            XLSX.writeFile(wb, `Refund_${member.name}_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        function printSepRefund() { let memberId = document.getElementById('refundSepMemberSelect').value; if (!memberId) return alert(
+                "አባል ይምረጡ"); let member = separatedMembers.find(s => s.memberId === memberId); if (!member) return; let refunds =
+                member.refunds || []; let rows = refunds.map(r =>
+                `<tr><td>${r.applyDate}</td><td>${r.receiptNo}</td><td>${r.transferDate}</td><td>${r.bankCode}</td><td>${r.amount.toLocaleString()} ብር</td></tr>`
+                ).join(''); let html =
+                `<div class="print-header"><h2>የገንዘብ ተመላሽ ሪፖርት</h2><div style="display:grid;grid-template-columns:1fr 1fr;"><div><b>ስም:</b> ${member.name}</div><div><b>አድራሻ:</b> ${member.address}</div><div><b>ስልክ:</b> ${member.phone}</div><div><b>የማህበሩ ስያሜ:</b> ${member.associationGivenName || '-'}</div></div></div><table class="print-table"><thead><th>ያመለከተበት ቀን</th><th>ተ.ቁጥር</th><th>የተላለፈበት ቀን</th><th>ባንክ ኮድ</th><th>መጠን</th></thead><tbody>${rows}</tbody></table>`;
+            doPrint(html); }
+
+        // Construction functions
+        function calculateTotalCost() { let total = 0; for (let c of materialTypes)
+            for (let i of(materials[c] || [])) total += (i.total || 0); return total; }
+
+        function updateConstructionTotalDisplay() { let total = calculateTotalCost();
+            document.getElementById('totalConstructionCost').innerHTML = formatDecimal(total);
+            document.getElementById('totalMaterialExpense').innerHTML = total.toLocaleString(); }
+
+        function renderConstructionSummary() { updateConstructionTotalDisplay(); let html = ''; for (let cat of materialTypes) { let
+                total = 0; for (let i of(materials[cat] || [])) total += i.total || 0;
+            html +=
+                `<div class="chip-cat" onclick="showMaterialDetail('${cat}')"><strong>${typeLabels[cat]}</strong><br>${formatDecimal(total)} ብር</div>`; }
+            document.getElementById('materialSummaryChips').innerHTML = html; }
+
+        function showMaterialDetail(cat) { let data = materials[cat] || []; let html =
+                `<table class="data-table"><thead><th>ተ.ቁጥር</th><th>ቀን</th><th>ዓይነት</th><th>ብዛት</th><th>ክፍል</th><th>ጠቅላላ</th></thead><tbody>` +
+                data.map(r =>
+                    `<tr><td class="green-bold">${r.receiptNo}</td><td class="green-bold">${r.date}</td><td class="green-bold">${r.type}</td><td class="green-bold">${r.quantity}</td><td class="green-bold">${r.unit}</td><td class="green-bold">${formatDecimal(r.total)}</td></tr>`
+                    ).join('') + `</tbody></table>`;
+            document.getElementById('specStatsContainer').innerHTML = html;
+            document.getElementById('detailedReportPanel').style.display = 'block'; }
+
+        function showMaterialTable(cat) { let isAdmin = currentUser.role === 'admin'; let data = materials[cat] || []; if (isAdmin) {
+                let html =
+                    `<table class="data-table"><thead><th>ተ.ቁጥር</th><th>ቀን</th><th>ዓይነት</th><th>ብዛት</th><th>ክፍል</th><th>ዋጋ/አንድ</th><th>ጠቅላላ</th><th>አቅራቢ</th></thead><tbody>`;
+                data.forEach((r, i) => { html +=
+                        `<tr><td class="green-bold"><input value="${r.receiptNo}" onchange="updateMat('${cat}',${i},'receiptNo',this.value)"></td><td class="green-bold"><input type="date" value="${r.date}" onchange="updateMat('${cat}',${i},'date',this.value)"></td><td class="green-bold"><input value="${r.type}" onchange="updateMat('${cat}',${i},'type',this.value)"></td><td class="green-bold"><input value="${r.quantity}" onchange="updateMat('${cat}',${i},'quantity',this.value)"></td><td class="green-bold"><input value="${r.unit}" onchange="updateMat('${cat}',${i},'unit',this.value)"></td><td class="green-bold"><input value="${r.pricePerUnit}" onchange="updateMat('${cat}',${i},'pricePerUnit',this.value)"></td><td class="green-bold">${formatDecimal(r.total)}</td><td class="green-bold"><input value="${r.supplier}" onchange="updateMat('${cat}',${i},'supplier',this.value)"></td></tr>`; });
+                html +=
+                    `</tbody></table><button class="btn-sm btn-success" onclick="addMatRow('${cat}')">+ አዲስ ግዥ</button>`;
+                document.getElementById('materialSectionContainer').innerHTML = html; } else { let html =
+                    `<table class="data-table"><thead><th>ተ.ቁጥር</th><th>ቀን</th><th>ዓይነት</th><th>ብዛት</th><th>ክፍል</th><th>ዋጋ/አንድ</th><th>ጠቅላላ</th><th>አቅራቢ</th></thead><tbody>` +
+                    data.map(r =>
+                        `<tr><td class="green-bold">${r.receiptNo}</td><td class="green-bold">${r.date}</td><td class="green-bold">${r.type}</td><td class="green-bold">${r.quantity}</td><td class="green-bold">${r.unit}</td><td class="green-bold">${r.pricePerUnit}</td><td class="green-bold">${formatDecimal(r.total)}</td><td class="green-bold">${r.supplier}</td></tr>`
+                        ).join('') + `</tbody></table>`;
+                document.getElementById('materialSectionContainer').innerHTML = html; } }
+
+        function updateMat(cat, idx, field, val) { if (currentUser.role !== 'admin') return;
+            materials[cat][idx][field] = val; if (field === 'quantity' || field === 'pricePerUnit') materials[cat][idx].total = (
+                materials[cat][idx].quantity || 0) * (materials[cat][idx].pricePerUnit || 0);
+            saveConstruction();
+            showMaterialTable(cat);
+            renderConstructionSummary();
+            filterPurchaseReport();
+            updatePurchaseAnalysis();
+            updateFinancialSource(); }
+
+        function addMatRow(cat) { if (currentUser.role !== 'admin') return;
+            materials[cat].push({ receiptNo: getNextReceiptNumber(), date: new Date().toISOString().slice(0, 10), type: '',
+                quantity: 0, unit: '', pricePerUnit: 0, total: 0, supplier: '' });
+            saveConstruction();
+            showMaterialTable(cat);
+            renderConstructionSummary();
+            filterPurchaseReport();
+            updatePurchaseAnalysis();
+            updateFinancialSource(); }
+
+        function addNewPurchase() { if (currentUser.role !== 'admin') return; let cat = document.getElementById('newMaterialCat')
+                .value, receipt = document.getElementById('newReceiptNo').value || getNextReceiptNumber(), date = document
+                .getElementById('newPurchaseDate').value, type = document.getElementById('newMaterialSubType').value, unit =
+                document.getElementById('newUnit').value, qty = parseFloat(document.getElementById('newQuantity').value),
+                price = parseFloat(document.getElementById('newPricePerUnit').value), supplier = document.getElementById(
+                    'newSupplier').value; if (!date || isNaN(qty) || isNaN(price)) return alert("ሙላ"); let total = qty * price;
+            materials[cat].push({ receiptNo: receipt, date, type, quantity: qty, unit, pricePerUnit: price, total, supplier: supplier ||
+                    '-' });
+            saveConstruction();
+            renderConstructionSummary();
+            showMaterialTable(cat);
+            filterPurchaseReport();
+            alert("ግዥ ተመዝግቧል");
+            updatePurchaseAnalysis();
+            updateFinancialSource(); }
+
+        function filterPurchaseReport() { let start = document.getElementById('purchaseReportStart').value,
+                end = document.getElementById('purchaseReportEnd').value, cat = currentPurchaseCategory, all = []; let cats =
+                cat === 'all' ? materialTypes : [cat]; for (let c of cats)
+            for (let i of(materials[c] || [])) if ((!start || i.date >= start) && (!end || i.date <= end)) all.push({ cat: typeLabels[
+                        c], receipt: i.receiptNo, date: i.date, type: i.type, qty: i.quantity, unit: i.unit, price: i
+                    .pricePerUnit, total: i.total, supplier: i.supplier });
+            all.sort((a, b) => a.date.localeCompare(b.date)); let html =
+                `<table class="data-table"><thead><th>ተ.ቁጥር</th><th>ቀን</th><th>ምድብ</th><th>ዓይነት</th><th>ብዛት</th><th>ክፍል</th><th>ዋጋ</th><th>ጠቅላላ</th><th>አቅራቢ</th></thead><tbody>`;
+            let grand = 0; for (let p of all) { html +=
+                    `<tr><td class="green-bold">${p.receipt}</td><td class="green-bold">${p.date}</td><td class="green-bold">${p.cat}</td><td class="green-bold">${p.type}</td><td class="green-bold">${p.qty}</td><td class="green-bold">${p.unit}</td><td class="green-bold">${p.price}</td><td class="green-bold">${formatDecimal(p.total)}</td><td class="green-bold">${p.supplier}</td></tr>`;
+                grand += p.total; }
+            html +=
+                `<tr><td colspan="8">ድምር</td><td colspan="2" class="green-bold">${formatDecimal(grand)} ብር</td></tr></tbody></table>`;
+            document.getElementById('purchaseReportResults').innerHTML = all.length ? html : "ምንም ግዥ የለም"; }
+
+        function exportPurchaseReportExcel() { let start = document.getElementById('purchaseReportStart').value,
+                end = document.getElementById('purchaseReportEnd').value, cat = currentPurchaseCategory; let cats = cat ===
+                'all' ? materialTypes : [cat]; let all = []; for (let c of cats)
+            for (let i of(materials[c] || [])) if ((!start || i.date >= start) && (!end || i.date <= end)) all.push({ cat: typeLabels[
+                        c], receipt: i.receiptNo, date: i.date, type: i.type, qty: i.quantity, unit: i.unit, price: i
+                    .pricePerUnit, total: i.total, supplier: i.supplier }); let wsData = [
+                ["ተ.ቁጥር", "ቀን", "ምድብ", "ዓይነት", "ብዛት", "ክፍል", "ዋጋ/አንድ", "ጠቅላላ", "አቅራቢ"]
+            ];
+            all.forEach(p => wsData.push([p.receipt, p.date, p.cat, p.type, p.qty, p.unit, p.price, p.total, p.supplier])); let ws =
+                XLSX.utils.aoa_to_sheet(wsData); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Purchase Report");
+            XLSX.writeFile(wb, `purchase_report_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        function renderMaterialNav() { let html = ''; for (let k of materialTypes)
+            html += `<button class="material-btn" onclick="showMaterialTable('${k}')">${typeLabels[k]}</button>`;
+            document.getElementById('materialNav').innerHTML = html;
+            showMaterialTable('iron'); }
+
+        function togglePurchaseReport() { let c = document.getElementById('purchaseReportContent'),
+                i = document.getElementById('purchaseReportIcon');
+            c.classList.toggle('show');
+            i.classList.toggle('fa-chevron-down');
+            i.classList.toggle('fa-chevron-up'); if (c.classList.contains('show')) filterPurchaseReport(); }
+
+        function toggleNewPurchaseCard() { let c = document.getElementById('newPurchaseCardContent'),
+                i = document.getElementById('newPurchaseCardIcon');
+            c.classList.toggle('show');
+            i.classList.toggle('fa-chevron-down');
+            i.classList.toggle('fa-chevron-up'); if (c.classList.contains('show')) document.getElementById('newReceiptNo')
+                .value = getNextReceiptNumber(); }
+
+        function setPurchaseCategory(cat) { currentPurchaseCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => { if (btn.getAttribute('data-cat') === cat) btn.classList
+                    .add('active');
+                else btn.classList.remove('active'); });
+            filterPurchaseReport(); }
+        document.getElementById('newMaterialCat')?.addEventListener('change', function() { let sub = document.getElementById(
+                'subTypeContainer'); if (this.value === 'iron') { let options = ''; for (let size = 8; size <= 24; size += 2)
+                options += `<option>${size}ሚሜ</option>`;
+            sub.innerHTML = `<select id="newMaterialSubType">${options}</select>`; } else if (this.value === 'others') { sub
+                .innerHTML = '<input type="text" id="newMaterialSubType" placeholder="የአገልግሎት አይነት">'; } else { sub
+                .innerHTML =
+                '<select id="newMaterialSubType"><option>8ሚሜ</option><option>10ሚሜ</option><option>12ሚሜ</option></select>'; }
+        });
+
+        // ==================== WORK PAYMENT FUNCTIONS ====================
+        function updateWorkMemberSelect() { let sel = document.getElementById('workMemberSelect'); if (!sel) return; let filter =
+                document.querySelector('input[name="workSocietyFilter"]:checked')?.value || 'all'; let list = filter === 'all' ?
+                membersList : membersList.filter(m => m.membershipType === filter);
+            sel.innerHTML = '<option value="">አባል ምረጥ</option>' + list.map(m =>
+                `<option value="${m.id}">${m.id} - ${m.name}</option>`).join(''); }
+
+        function filterWorkMembers() { updateWorkMemberSelect(); }
+
+        function addWorkPayment() { if (currentUser.role !== 'admin') return; let memberId = document.getElementById(
+                'workMemberSelect').value; if (!memberId) return alert("አባል ይምረጡ"); let date = document.getElementById(
+                'workDate').value; if (!date) return alert("ቀን ያስገቡ"); let shares = parseInt(document.getElementById(
+                'workSharesQuantity').value) || 0; let amount = parseFloat(document.getElementById('workAmount').value); if (
+                isNaN(amount) || amount <= 0) return alert("ትክክለኛ ገንዘብ ያስገቡ"); let bankCode = document.getElementById(
+                'workBankCode').value.trim() || '-';
+            workPayments.push({ id: "WP-" + String(Math.floor(Math.random() * 10000)).padStart(4, '0'), memberId, date, shares,
+                amount, bankCode });
+            saveWorkPayments();
+            alert("የስራ ማስኪጃ ተመዝግቧል");
+            document.getElementById('workDate').value = '';
+            document.getElementById('workSharesQuantity').value = '';
+            document.getElementById('workAmount').value = '';
+            document.getElementById('workBankCode').value = ''; }
+
+        function deleteWorkPayment(index) { if (!confirm("ማጥፋት?")) return;
+            workPayments.splice(index, 1);
+            saveWorkPayments(); }
+
+        function renderWorkPaymentList() { let container = document.getElementById('workPaymentListContainer'); if (!container)
+            return; if (workPayments.length === 0) { container.innerHTML =
+                '<p>ምንም የተመዘገበ የስራ ማስኪጃ የለም</p>'; return; } let html =
+                `<table class="data-table"><thead><th>ቀን</th><th>አባል</th><th>አክሲዮን</th><th>መጠን</th><th>ባንክ ኮድ</th><th>ድርጊት</th></thead><tbody>`;
+            workPayments.forEach((wp, idx) => { let member = membersList.find(m => m.id === wp.memberId) || { name: "ያልታወቀ" };
+                html +=
+                    `<tr><td class="green-bold">${wp.date}</td><td class="green-bold">${member.name} (${wp.memberId})</td><td>${wp.shares}</td><td class="green-bold">${wp.amount.toLocaleString()} ብር</td><td>${wp.bankCode}</td><td><button class="btn-sm btn-danger" onclick="deleteWorkPayment(${idx})">ሰርዝ</button></td></tr>`; });
+            html += `</tbody></table>`;
+            container.innerHTML = html; }
+
+        function toggleWorkPaymentCard() { let content = document.getElementById('workPaymentContent');
+            content.classList.toggle('show'); if (content.classList.contains('show')) { updateWorkMemberSelect();
+                renderWorkPaymentList(); } }
+
+        function onReportTypeChange() { currentReportDataType = document.querySelector(
+                'input[name="reportDataType"]:checked')?.value || 'contributions';
+            document.getElementById('contributionTypeFilterRow').style.display = currentReportDataType === 'contributions' ?
+                'flex' : 'none';
+            document.getElementById('shareholderStatusFilterRow').style.display = currentReportDataType === 'contributions' ?
+                'flex' : 'none';
+            filterContributionReportAndChart(); }
+
+        function filterContributionReportAndChart() { let start = document.getElementById('reportStartDate').value,
+                end = document.getElementById('reportEndDate').value; let dataType = currentReportDataType; let selectedMemberId =
+                document.getElementById('reportMemberSelect')?.value || 'all'; if (currentUser.role === 'member' && currentUser
+                .memberId) { selectedMemberId = currentUser.memberId; } let all = [],
+                grandTotal = 0; if (dataType === 'contributions') { let memberFilter = document.querySelector(
+                    'input[name="reportMemberType"]:checked')?.value || 'all'; let contribFilter = document.querySelector(
+                    'input[name="reportContributionType"]:checked')?.value || 'all'; let statusFilter = document.querySelector(
+                    'input[name="reportShareholderStatus"]:checked')?.value || 'all'; for (let mid in contributions) { let member =
+                    membersList.find(m => m.id === mid); if (!member) continue; if (memberFilter !== 'all' && member
+                    .membershipType !== memberFilter) continue; if (statusFilter !== 'all' && member.shareholderStatus !==
+                    statusFilter) continue; if (selectedMemberId !== 'all' && mid !== selectedMemberId) continue;
+                contributions[mid].forEach((c, idx) => { if (contribFilter !== 'all' && c.type !== contribFilter)
+                        return; if ((!start || c.date >= start) && (!end || c.date <= end)) { all.push({ ...c,
+                            memberName: member.name, memberType: member.membershipType, memberId: mid,
+                            contribIndex: idx });
+                        grandTotal += c.amount; } }); } } else { let memberFilter = document.querySelector(
+                    'input[name="reportMemberType"]:checked')?.value || 'all'; for (let wp of workPayments) { let member =
+                    membersList.find(m => m.id === wp.memberId) || { name: "ያልታወቀ", membershipType: '',
+                        shareholderStatus: '' }; if (memberFilter !== 'all' && member.membershipType !==
+                    memberFilter) continue; if (selectedMemberId !== 'all' && wp.memberId !== selectedMemberId)
+                continue; if ((!start || wp.date >= start) && (!end || wp.date <= end)) { all.push({ receiptNo: wp.id,
+                        date: wp.date, month: wp.date.slice(0, 7), memberName: member.name, memberType: member
+                        .membershipType, memberId: wp.memberId, amount: wp.amount, shares: wp.shares, bankCode: wp
+                        .bankCode, type: 'work' });
+                    grandTotal += wp.amount; } } } let isAdmin = currentUser.role === 'admin'; let html = dataType ===
+                'contributions' ?
+                `<table class="data-table"><thead><th>ደረሰኝ</th><th>ቀን</th><th>ወር</th><th>ማህበር</th><th>ስም</th><th>ዓይነት</th><th>ባንክ ኮድ</th><th>መጠን</th>${isAdmin?'<th>ድርጊት</th>':''}</thead><tbody>`
+                :
+                `<table class="data-table"><thead><th>ID</th><th>ቀን</th><th>ማህበር</th><th>ስም</th><th>አክሲዮን</th><th>ባንክ ኮድ</th><th>መጠን</th>${isAdmin?'<th>ድርጊት</th>':''}</thead><tbody>`;
+            for (let c of all) { if (dataType === 'contributions') { html +=
+                        `<tr><td class="green-bold">${c.receiptNo}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.month}</td><td class="green-bold">${c.memberType==='Wazema'?'ዋዜሜ':'ፕላኔት'}</td><td class="green-bold">${c.memberName}</td><td class="green-bold">${c.type==='regular'?'መደበኛ':'ልዩ'}</td><td class="green-bold">${c.bankCode}</td><td class="green-bold">${c.amount.toLocaleString()} ብር</td>`;
+                    if (isAdmin) html +=
+                        `<td><button class="btn-sm btn-warning" onclick="editContribution('${c.memberId}',${c.contribIndex})">አርም</button> <button class="btn-sm btn-danger" onclick="deleteContribution('${c.memberId}',${c.contribIndex})">ሰርዝ</button></td>`; } else { html +=
+                        `<tr><td class="green-bold">${c.receiptNo}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.memberType==='Wazema'?'ዋዜሜ':'ፕላኔት'}</td><td class="green-bold">${c.memberName}</td><td>${c.shares||0}</td><td>${c.bankCode}</td><td class="green-bold">${c.amount.toLocaleString()} ብር</td>`;
+                    if (isAdmin) html +=
+                        `<td><button class="btn-sm btn-danger" onclick="deleteWorkPayment(${workPayments.findIndex(wp=>wp.id===c.receiptNo)})">ሰርዝ</button></td>`; }
+                html += `</tr>`; }
+            html +=
+                `<tr><td colspan="${dataType==='contributions'?7:6}">ጠቅላላ ድምር<td colspan="2" class="green-bold">${grandTotal.toLocaleString()} ብር</td></tr></tbody></table>`;
+            document.getElementById('reportResultsContainer').innerHTML = all.length ? html : "ምንም ውጤት የለም"; let monthly =
+                new Map();
+            all.forEach(c => { monthly.set(c.month, (monthly.get(c.month) || 0) + c.amount); }); let sorted = Array.from(
+                monthly.keys()).sort(); if (contributionChart) contributionChart.destroy();
+            contributionChart = new Chart(document.getElementById('contributionChart').getContext('2d'), { type: 'bar',
+                data: { labels: sorted, datasets: [{ label: dataType === 'contributions' ? 'መዋጮ (ብር)' :
+                            'የስራ ማስኪጃ (ብር)', data: sorted.map(m => monthly.get(m)), backgroundColor: '#ff9800'
+                    }] }, options: { responsive: true } }); }
+
+        function exportContributionReportExcel() { if (currentReportDataType === 'workPayments') { let start = document
+                .getElementById('reportStartDate').value,
+                end = document.getElementById('reportEndDate').value; let data = workPayments.filter(wp => { if (start && wp
+                    .date < start) return false; if (end && wp.date > end) return false; return true; }); let wsData = [
+                    ["ID", "ቀን", "አባል", "አክሲዮን", "መጠን", "ባንክ ኮድ"]
+                ];
+            data.forEach(wp => { let member = membersList.find(m => m.id === wp.memberId) || { name: "ያልታወቀ" };
+                    wsData.push([wp.id, wp.date, member.name, wp.shares, wp.amount, wp.bankCode]); }); let wb = XLSX.utils
+                .book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "WorkPayments");
+            XLSX.writeFile(wb, `work_payments_${new Date().toISOString().slice(0,10)}.xlsx`); return; } let start = document
+                .getElementById('reportStartDate').value,
+                end = document.getElementById('reportEndDate').value; let memberFilter = document.querySelector(
+                    'input[name="reportMemberType"]:checked')?.value || 'all'; let contribFilter = document.querySelector(
+                    'input[name="reportContributionType"]:checked')?.value || 'all'; let statusFilter = document.querySelector(
+                    'input[name="reportShareholderStatus"]:checked')?.value || 'all'; let all = []; for (let mid in
+                    contributions) { let member = membersList.find(m => m.id === mid); if (!member) continue; if (
+                        memberFilter !== 'all' && member.membershipType !== memberFilter) continue; if (statusFilter !==
+                        'all' && member.shareholderStatus !== statusFilter) continue;
+                contributions[mid].forEach(c => { if (contribFilter !== 'all' && c.type !== contribFilter) return; if ((!
+                        start || c.date >= start) && (!end || c.date <= end)) all.push({ ...c, memberName: member
+                        .name, memberType: member.membershipType }); }); } let wsData = [
+                ["ደረሰኝ", "ቀን", "ወር", "ማህበር", "ስም", "ዓይነት", "ባንክ ኮድ", "መጠን"]
+            ];
+            all.forEach(c => wsData.push([c.receiptNo, c.date, c.month, c.memberType === 'Wazema' ? 'ዋዜሜ' : 'ፕላኔት', c
+                .memberName, c.type === 'regular' ? 'መደበኛ' : 'ልዩ', c.bankCode, c.amount
+            ])); let ws = XLSX.utils.aoa_to_sheet(wsData); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Contribution Report");
+            XLSX.writeFile(wb, `contribution_report_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        // ==================== FIXED PRINT FUNCTION (Request 2) ====================
+        function printContributionReportWithType() {
+            let type = document.getElementById('printTypeSelect').value;
+            if (type === 'chart') {
+                let canvas = document.getElementById('contributionChart');
+                let img = canvas.toDataURL('image/png');
+                let win = window.open('', '_blank');
+                win.document.write(
+                    `<html><head><style>body{font-family:sans-serif;}.watermark-text{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%)rotate(-25deg);font-size:32px;color:rgba(0,0,0,0.1);}</style></head><body><div class="watermark-text">THE TREASURE OF WAZEMA AND PLANET(KOK TRADING)</div><h2>${currentReportDataType==='workPayments'?'የስራ ማስኪጃ ገበታ':'የመዋጮ ገበታ'}</h2><img src="${img}"style="max-width:100%"/></body></html>`
+                    );
+                win.document.close();
+                win.print();
+            } else if (type === 'allMembers') {
+                // Print all members' filtered report
+                let start = document.getElementById('reportStartDate').value;
+                let end = document.getElementById('reportEndDate').value;
+                let memberFilter = document.querySelector('input[name="reportMemberType"]:checked')?.value || 'all';
+                let contribFilter = document.querySelector('input[name="reportContributionType"]:checked')?.value || 'all';
+                let statusFilter = document.querySelector('input[name="reportShareholderStatus"]:checked')?.value || 'all';
+                let filteredMembers = membersList.filter(m => {
+                    if (memberFilter !== 'all' && m.membershipType !== memberFilter) return false;
+                    if (statusFilter !== 'all' && m.shareholderStatus !== statusFilter) return false;
+                    return true;
+                });
+                if (filteredMembers.length === 0) return alert("ምንም አባል አልተገኘም");
+                let allHtml = '';
+                filteredMembers.forEach((member, idx) => {
+                    let societyLabel = member.membershipType === 'Wazema' ? 'ዋዜሜ' : 'ፕላኔት';
+                    if (currentReportDataType === 'contributions') {
+                        let contribs = contributions[member.id] || [];
+                        let filtered = contribs.filter(c => {
+                            if (contribFilter !== 'all' && c.type !== contribFilter) return false;
+                            if (start && c.date < start) return false;
+                            if (end && c.date > end) return false;
+                            return true;
+                        });
+                        let totalSum = filtered.reduce((s, c) => s + c.amount, 0);
+                        let rows = filtered.map(c =>
+                            `<tr><td class="green-bold">${c.receiptNo}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.type==='regular'?'መደበኛ':'ልዩ'}</td><td class="green-bold">${c.bankCode}</td><td class="green-bold">${c.amount.toLocaleString()} ብር</td></tr>`
+                            ).join('');
+                        allHtml +=
+                            `<div style="page-break-before:${idx>0?'always':'auto'};margin-bottom:20px;"><div class="print-header"><h2>${societyLabel} አፓርትመንት</h2></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;"><div><strong>የማህበሩ ስም:</strong>${societyLabel}</div><div><strong>የባለአክሲዮኑ ስም:</strong>${member.name}</div><div><strong>የማህበሩ መጠሪያ ስም:</strong>${member.associationGivenName||'-'}</div><div><strong>መለያ ኮድ:</strong>${member.id}</div><div><strong>ስልክ ቁጥር:</strong>${member.phone}</div><div><strong>አድራሻ:</strong>${member.address}</div><div><strong>ያለው አክሲዮን ብዛት:</strong>${member.shares}</div></div><table class="print-table"><thead><th>ደረሰኝ ቁጥር</th><th>መረጃ የተጫነበት ቀን</th><th>ክፍያ ቀን</th><th>ታይፕ</th><th>ባንክ ኮድ</th><th>መጠን</th></thead><tbody>${rows}</tbody></table><div style="margin-top:20px;"><strong>ጠቅላላ ድምር:${totalSum.toLocaleString()} ብር</strong></div></div>`;
+                    } else {
+                        let work = workPayments.filter(wp => wp.memberId === member.id && (!start || wp.date >=
+                            start) && (!end || wp.date <= end));
+                        let totalSum = work.reduce((s, wp) => s + wp.amount, 0);
+                        let rows = work.map(wp =>
+                            `<tr><td>${wp.id}</td><td>${wp.date}</td><td>${wp.shares}</td><td>${wp.bankCode}</td><td>${wp.amount.toLocaleString()} ብር</td></tr>`
+                            ).join('');
+                        allHtml +=
+                            `<div style="page-break-before:${idx>0?'always':'auto'};margin-bottom:20px;"><div class="print-header"><h2>${societyLabel} - የስራ ማስኪጃ ሪፖርት</h2></div><div style="display:grid;grid-template-columns:1fr 1fr;"><div><b>ስም:</b> ${member.name}</div><div><b>ኮድ:</b> ${member.id}</div></div><table class="print-table"><thead><th>ID</th><th>ቀን</th><th>አክሲዮን</th><th>ባንክ ኮድ</th><th>መጠን</th></thead><tbody>${rows}</tbody></table><div><strong>ጠቅላላ: ${totalSum.toLocaleString()} ብር</strong></div></div>`;
+                    }
+                });
+                doPrint(allHtml);
+            } else {
+                // Text report - single member or all members table
+                let mId = document.getElementById('reportMemberSelect').value;
+                if (currentUser.role === 'member' && currentUser.memberId) { mId = currentUser.memberId; }
+                if (mId === 'all') {
+                    // Print the currently displayed table for all members
+                    let tableContent = document.getElementById('reportResultsContainer').innerHTML;
+                    if (!tableContent || tableContent === 'ምንም ውጤት የለም') return alert("ምንም ውሂብ የለም");
+                    let dataTypeLabel = currentReportDataType === 'contributions' ? 'የመዋጮ ሪፖርት' : 'የስራ ማስኪጃ ሪፖርት';
+                    doPrint(
+                        `<div class="print-header"><h2>${dataTypeLabel} - ሁሉም አባላት</h2></div>${tableContent}`);
+                    return;
+                }
+                let member = membersList.find(m => m.id === mId);
+                if (!member) return alert("አባል አልተገኘም");
+                let start = document.getElementById('reportStartDate').value;
+                let end = document.getElementById('reportEndDate').value;
+                if (currentReportDataType === 'contributions') {
+                    let contribs = contributions[member.id] || [];
+                    let contribFilter = document.querySelector('input[name="reportContributionType"]:checked')
+                        ?.value || 'all';
+                    let filtered = contribs.filter(c => {
+                        if (contribFilter !== 'all' && c.type !== contribFilter) return false;
+                        if (start && c.date < start) return false;
+                        if (end && c.date > end) return false;
+                        return true;
+                    });
+                    let totalSum = filtered.reduce((s, c) => s + c.amount, 0);
+                    let rows = filtered.map(c =>
+                        `<tr><td class="green-bold">${c.receiptNo}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.type==='regular'?'መደበኛ':'ልዩ'}</td><td class="green-bold">${c.bankCode}</td><td class="green-bold">${c.amount.toLocaleString()} ብር</td></tr>`
+                        ).join('');
+                    let societyLabel = member.membershipType === 'Wazema' ? 'ዋዜሜ' : 'ፕላኔት';
+                    let html =
+                        `<div><div class="print-header"><h2>${societyLabel} አፓርትመንት</h2></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;"><div><strong>የማህበሩ ስም:</strong>${societyLabel}</div><div><strong>የባለአክሲዮኑ ስም:</strong>${member.name}</div><div><strong>የማህበሩ መጠሪያ ስም:</strong>${member.associationGivenName||'-'}</div><div><strong>መለያ ኮድ:</strong>${member.id}</div><div><strong>ስልክ ቁጥር:</strong>${member.phone}</div><div><strong>አድራሻ:</strong>${member.address}</div><div><strong>ያለው አክሲዮን ብዛት:</strong>${member.shares}</div></div><table class="print-table"><thead><th>ደረሰኝ ቁጥር</th><th>መረጃ የተጫነበት ቀን</th><th>ክፍያ ቀን</th><th>ታይፕ</th><th>ባንክ ኮድ</th><th>መጠን</th></thead><tbody>${rows}</tbody></table><div style="margin-top:20px;"><strong>ጠቅላላ ድምር:${totalSum.toLocaleString()} ብር</strong></div></div>`;
+                    doPrint(html);
+                } else {
+                    let work = workPayments.filter(wp => wp.memberId === member.id && (!start || wp.date >= start) && (
+                        !end || wp.date <= end));
+                    let totalSum = work.reduce((s, wp) => s + wp.amount, 0);
+                    let rows = work.map(wp =>
+                        `<tr><td>${wp.id}</td><td>${wp.date}</td><td>${wp.shares}</td><td>${wp.bankCode}</td><td>${wp.amount.toLocaleString()} ብር</td></tr>`
+                        ).join('');
+                    let societyLabel = member.membershipType === 'Wazema' ? 'ዋዜሜ' : 'ፕላኔት';
+                    let html =
+                        `<div><div class="print-header"><h2>${societyLabel} - የስራ ማስኪጃ ሪፖርት</h2></div><div style="display:grid;grid-template-columns:1fr 1fr;"><div><b>ስም:</b> ${member.name}</div><div><b>ኮድ:</b> ${member.id}</div></div><table class="print-table"><thead><th>ID</th><th>ቀን</th><th>አክሲዮን</th><th>ባንክ ኮድ</th><th>መጠን</th></thead><tbody>${rows}</tbody></table><div><strong>ጠቅላላ: ${totalSum.toLocaleString()} ብር</strong></div></div>`;
+                    doPrint(html);
+                }
+            }
+        }
+
+        function selectMember(id) { selectedMemberForPrint = membersList.find(m => m.id === id);
+            renderMemberListTable();
+            alert(`አባል ${id} ተመርጧል`); }
+
+        function printSelectedMemberOnly() { if (!selectedMemberForPrint) return alert("አባል ይምረጡ"); let m =
+            selectedMemberForPrint, contribs = contributions[m.id] || [], total = contribs.reduce((s, c) => s + c.amount, 0),
+            remaining = getRemainingForMember(m); let rows = contribs.map(c =>
+                `<tr><td class="green-bold">${c.receiptNo}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.date}</td><td class="green-bold">${c.type==='regular'?'መደበኛ':'ልዩ'}</td><td class="green-bold">${c.bankCode}</td><td class="green-bold">${c.amount.toLocaleString()} ብር</td></tr>`
+                ).join(''); let html =
+                `<div class="print-header"><h2>${m.membershipType==='Wazema'?'ዋዜሜ':'ፕላኔት'} አፓርትመንት</h2><div style="display:grid;grid-template-columns:1fr 1fr;"><div><b>ስም:</b> ${m.name}</div><div><b>ኮድ:</b> ${m.id}</div><div><b>ስልክ:</b> ${m.phone}</div><div><b>መጠሪያ:</b> ${m.associationGivenName||'-'}</div><div><b>አክሲዮን:</b> ${m.shares}</div><div><b>የሚጠበቅ:</b> ${formatDecimal(getExpectedTotalForMember(m))} ብር</div><div><b>ቀሪ:</b> ${formatDecimal(remaining)} ብር</div></div></div><table class="print-table"><thead><th>ደረሰኝ</th><th>የተጫነበት ቀን</th><th>ክፍያ ቀን</th><th>ታይፕ</th><th>ባንክ ኮድ</th><th>መጠን</th></thead><tbody>${rows}</tbody></table><div><strong>ጠቅላላ: ${total.toLocaleString()} ብር</strong></div>`;
+            doPrint(html); }
+
+        function printAllMembersFiltered() { let filter = document.querySelector('input[name="memberListFilter"]:checked')
+                ?.value || 'all', statusFilter = document.querySelector('input[name="memberStatusFilter"]:checked')?.value ||
+                'all'; let filtered = membersList.filter(m => (filter === 'all' || m.membershipType === filter) && (
+                    statusFilter === 'all' || m.shareholderStatus === statusFilter)); let rows = '',
+                grandTotal = 0;
+            filtered.forEach((m, idx) => { let totalContrib = getPaidTotalForMember(m.id),
+                    expected = getExpectedTotalForMember(m), remaining = expected - totalContrib;
+                grandTotal += totalContrib;
+                rows +=
+                    `<tr><td>${idx+1}</td><td>${m.name}</td><td>${m.associationGivenName||'-'}</td><td>${m.phone}</td><td>${m.shares}</td><td>${formatDecimal(expected)}</td><td>${formatDecimal(totalContrib)}</td><td>${formatDecimal(remaining)}</td></tr>`; });
+            let html =
+                `<div class="print-header"><h2>${filter==='all'?'ሁሉም ማህበራት':(filter==='Wazema'?'ዋዜሜ':'ፕላኔት')} አፓርትመንት</h2></div><table class="print-table"><thead><th>ተራ</th><th>ስም</th><th>መጠሪያ</th><th>ስልክ</th><th>አክሲዮን</th><th>የሚጠበቅ</th><th>የተከፈለ</th><th>ቀሪ</th></thead><tbody>${rows}</tbody></table><div><strong>ጠቅላላ: ${grandTotal.toLocaleString()} ብር</strong></div>`;
+            doPrint(html); }
+
+        function exportSelectedMemberToExcel() { if (!selectedMemberForPrint) return alert("አባል ይምረጡ"); let m =
+            selectedMemberForPrint; let contribs = contributions[m.id] || []; let wsData = [
+                ["ደረሰኝ", "ቀን", "ወር", "ዓይነት", "ባንክ ኮድ", "መጠን"]
+            ];
+            contribs.forEach(c => wsData.push([c.receiptNo, c.date, c.month, c.type === 'regular' ? 'መደበኛ' : 'ልዩ', c
+                .bankCode, c.amount
+            ])); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), `member_${m.id}`);
+            XLSX.writeFile(wb, `member_${m.id}_contributions.xlsx`); }
+
+        function editContribution(memberId, contribIndex) {
+            if (currentUser.role !== 'admin') return;
+            let contrib = contributions[memberId]?.[contribIndex];
+            if (!contrib) return;
+            let newAmount = prompt("አዲስ መጠን (ብር):", contrib.amount);
+            if (newAmount !== null && !isNaN(parseFloat(newAmount)) && parseFloat(newAmount) >= 0) {
+                contrib.amount = parseFloat(newAmount);
+                let newBank = prompt("አዲስ ባንክ ኮድ:", contrib.bankCode);
+                if (newBank !== null) contrib.bankCode = newBank.trim() || contrib.bankCode;
+                let newDate = prompt("አዲስ ቀን (YYYY-MM-DD):", contrib.date);
+                if (newDate !== null && newDate.trim()) contrib.date = newDate.trim();
+                saveContributions();
+                filterContributionReportAndChart();
+                alert("መዋጮ ተሻሽሏል");
+            }
+        }
+
+        function deleteContribution(memberId, contribIndex) {
+            if (currentUser.role !== 'admin') return;
+            if (!confirm("ይህን መዋጮ ማጥፋት ይፈልጋሉ?")) return;
+            if (contributions[memberId]) {
+                contributions[memberId].splice(contribIndex, 1);
+                if (contributions[memberId].length === 0) delete contributions[memberId];
+                saveContributions();
+                filterContributionReportAndChart();
+                alert("መዋጮ ተሰርዟል");
+            }
+        }
+
+        function addContribution() {
+            if (currentUser.role !== 'admin') return;
+            let memberId = document.getElementById('contributionMemberSelect').value;
+            if (!memberId) return alert("አባል ይምረጡ");
+            let date = document.getElementById('contributionDate').value;
+            if (!date) return alert("ቀን ያስገቡ");
+            let amount = parseFloat(document.getElementById('contributionAmount').value);
+            if (isNaN(amount) || amount <= 0) return alert("ትክክለኛ መጠን ያስገቡ");
+            let bankCode = document.getElementById('bankCodeInput').value.trim() || '-';
+            let type = document.querySelector('input[name="contributionType"]:checked')?.value || 'regular';
+            let receiptNo = "RCP-" + String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            let month = date.slice(0, 7);
+            if (!contributions[memberId]) contributions[memberId] = [];
+            contributions[memberId].push({ receiptNo, date, month, type, bankCode, amount });
+            saveContributions();
+            filterContributionReportAndChart();
+            alert("መዋጮ ተመዝግቧል");
+            document.getElementById('contributionAmount').value = '';
+            document.getElementById('bankCodeInput').value = '';
+        }
+
+        function renderMemberListTable() { let tbody = document.getElementById('memberListTableBody'); if (!tbody) return; let
+                filter = document.querySelector('input[name="memberListFilter"]:checked')?.value || 'all'; let statusFilter =
+                document.querySelector('input[name="memberStatusFilter"]:checked')?.value || 'all'; let search = document
+                .getElementById('memberSearchInput').value.toLowerCase(); let field = document.getElementById(
+                    'memberSearchField').value; let filtered = membersList.filter(m => (filter === 'all' || m.membershipType ===
+                    filter) && (statusFilter === 'all' || m.shareholderStatus === statusFilter)); if (search) filtered =
+                filtered.filter(m => { if (field === 'name') return m.name.toLowerCase().includes(search); if (field ===
+                        'id') return m.id.toLowerCase().includes(search); if (field === 'phone') return m.phone.includes(
+                        search); return true; });
+            tbody.innerHTML = filtered.map(m => { let expected = getExpectedTotalForMember(m); let paid =
+                    getPaidTotalForMember(m.id); let remaining = expected - paid; let isSelected = (
+                    selectedMemberForPrint && selectedMemberForPrint.id === m.id); return `<tr style="${isSelected?
+        'background-color:#e8f5e9;':''}"><td>${m.name}</td><td>${m.gender}</td><td>${m.address}</td><td>${m.phone}</td><td class="green-bold">${m.associationGivenName||'-'}</td><td>${m.shares}</td><td class="green-bold">${formatDecimal(expected)}</td><td class="green-bold">${formatDecimal(paid)}</td><td class="green-bold">${formatDecimal(remaining)}</td><td class="action-buttons"><button class="btn-sm" onclick="selectMember('${m.id}')">ምረጥ</button> <button class="btn-sm btn-warning" onclick="editMember('${m.id}')">አርም</button> <button class="btn-sm btn-danger" onclick="deleteMember('${m.id}')">ሰርዝ</button></td></tr>`; })
+                .join('');
+            document.getElementById('totalMembersCount').innerText = membersList.length;
+            updateMemberSelect();
+            updateStats();
+            updateSeparationStats();
+            runAnalysis(); let reportSelect = document.getElementById('reportMemberSelect'); if (reportSelect) reportSelect
+                .innerHTML = '<option value="all">ሁሉም አባላት</option>' + membersList.map(m =>
+                    `<option value="${m.id}">${m.id} - ${m.name}</option>`).join('');
+            renderMemberListAnalysis();
+            updateExpectedTotals();
+            updateWorkMemberSelect();
+            updateWarningEncouragement(); }
+
+        function editMember(id) {
+            if (currentUser.role !== 'admin') return;
+            let member = membersList.find(m => m.id === id);
+            if (!member) return;
+            let newName = prompt("አዲስ ስም:", member.name);
+            if (newName !== null && newName.trim()) member.name = newName.trim();
+            let newPhone = prompt("አዲስ ስልክ:", member.phone);
+            if (newPhone !== null && newPhone.trim()) member.phone = newPhone.trim();
+            let newShares = prompt("አዲስ አክሲዮን ብዛት:", member.shares);
+            if (newShares !== null && !isNaN(parseInt(newShares)) && parseInt(newShares) > 0) member.shares = parseInt(
+            newShares);
+            saveMembers();
+            alert("አባል ተሻሽሏል");
+        }
+
+        function deleteMember(id) {
+            if (currentUser.role !== 'admin') return;
+            if (!confirm("እርግጠኛ ነዎት ይህን አባል ማጥፋት ይፈልጋሉ?")) return;
+            membersList = membersList.filter(m => m.id !== id);
+            if (contributions[id]) delete contributions[id];
+            saveMembers();
+            saveContributions();
+            alert("አባል ተሰርዟል");
+        }
+
+        function registerMember() {
+            if (currentUser.role !== 'admin') return;
+            let membershipType = document.querySelector('input[name="newMemberType"]:checked')?.value || 'Wazema';
+            let name = document.getElementById('newMemberName').value.trim();
+            if (!name) return alert("ስም ያስገቡ");
+            let phone = document.getElementById('newMemberPhone').value.trim();
+            let shares = parseInt(document.getElementById('newMemberShares').value) || 1;
+            let address = document.getElementById('newMemberAddress').value.trim();
+            let gender = document.getElementById('newMemberGender').value;
+            let associationGivenName = document.getElementById('newAssociationGivenName').value.trim();
+            let shareholderStatus = document.querySelector('input[name="shareholderStatus"]:checked')?.value || 'founder';
+            let id = generateId(membershipType);
+            let member = { id, name, phone, shares, address, gender, membershipType, shareholderStatus,
+                associationGivenName };
+            if (shareholderStatus === 'buyer') {
+                member.purchasedFrom = document.getElementById('purchasedFrom').value.trim();
+                member.purchaseDate = document.getElementById('purchaseDate').value;
+            }
+            membersList.push(member);
+            saveMembers();
+            alert("አባል ተመዝግቧል! አይዲ: " + id);
+            document.getElementById('newMemberName').value = '';
+            document.getElementById('newMemberPhone').value = '';
+            document.getElementById('newMemberShares').value = '1';
+            document.getElementById('newMemberAddress').value = '';
+            document.getElementById('newAssociationGivenName').value = '';
+            document.getElementById('purchasedFrom').value = '';
+            document.getElementById('purchaseDate').value = '';
+        }
+
+        function renderMemberListAnalysis() { let total = membersList.length; if (total === 0) { document.getElementById(
+                'memberAnalysisContainer').innerHTML = '<div class="analysis-item">ምንም አባል የለም</div>'; return; } let male =
+                membersList.filter(m => m.gender === 'ወንድ').length, female = total - male; let founders = membersList.filter(
+                    m => m.shareholderStatus === 'founder'), buyers = membersList.filter(m => m.shareholderStatus ===
+                    'buyer'); let founderMale = founders.filter(m => m.gender === 'ወንድ').length, founderFemale = founders
+                .length - founderMale; let buyerMale = buyers.filter(m => m.gender === 'ወንድ').length, buyerFemale = buyers
+                .length - buyerMale; let html =
+                `<div class="analysis-item"><div class="analysis-label">ጾታ (ወ/ሴ)</div>${male}(${((male/total)*100).toFixed(1)}%)/${female}(${((female/total)*100).toFixed(1)}%)</div><div class="analysis-item"><div class="analysis-label">መስራች (ወ/ሴ/ድምር)</div>${founderMale}/${founderFemale}/${founders.length}(${((founders.length/total)*100).toFixed(1)}%)</div><div class="analysis-item"><div class="analysis-label">ገዝቶ የገባ (ወ/ሴ/ድምር)</div>${buyerMale}/${buyerFemale}/${buyers.length}(${((buyers.length/total)*100).toFixed(1)}%)</div>`;
+            document.getElementById('memberAnalysisContainer').innerHTML = html; }
+
+        function updateMemberSelect() { let sel = document.getElementById('contributionMemberSelect'); if (!sel) return; let
+                filtered = adminMemberFilter === 'all' ? membersList : membersList.filter(m => m.membershipType ===
+                    adminMemberFilter);
+            sel.innerHTML = '<option value="">አባል ምረጥ</option>' + filtered.map(m =>
+                `<option value="${m.id}">${m.id} - ${m.name}</option>`).join(''); }
+
+        function filterMembersByType(t) { adminMemberFilter = t;
+            updateMemberSelect(); }
+
+        function updateStats() { let totalMoney = 0,
+                totalShares = 0; for (let mid in contributions) contributions[mid].forEach(c => totalMoney += c.amount);
+            membersList.forEach(m => totalShares += m.shares);
+            document.getElementById('totalAllContrib').innerText = totalMoney.toLocaleString();
+            document.getElementById('totalSharesAll').innerText = totalShares;
+            updateFinancialSource();
+            updateExpectedTotals(); }
+
+        function runAnalysis() { let society = document.getElementById('analysisSociety').value; let contribType = document
+                .getElementById('analysisContribType').value; let startDate = document.getElementById('analysisStartDate')
+                .value; let endDate = document.getElementById('analysisEndDate').value; let filtered = membersList.filter(m =>
+                    society === 'all' || m.membershipType === society); let total = filtered.length; let founderCount =
+                filtered.filter(m => m.shareholderStatus === 'founder').length; let buyerCount = total - founderCount; let
+                founderPct = total ? (founderCount / total * 100).toFixed(2) : 0; let buyerPct = total ? (buyerCount / total *
+                    100).toFixed(2) : 0; let activeFounders = 0,
+                activeBuyers = 0; let founderMoney = 0,
+                buyerMoney = 0,
+                totalMoney = 0; for (let m of filtered) { let mCont = contributions[m.id] || []; let hasPaid = false,
+                    mTotal = 0; for (let c of mCont) { if (contribType !== 'all' && c.type !== contribType) continue; if ((!
+                            startDate || c.date >= startDate) && (!endDate || c.date <= endDate)) { hasPaid = true;
+                        mTotal += c.amount; } } if (hasPaid) { if (m.shareholderStatus === 'founder')
+                    activeFounders++;
+                else activeBuyers++; }
+                totalMoney += mTotal; if (m.shareholderStatus === 'founder') founderMoney += mTotal;
+                else buyerMoney += mTotal; } let activeFounderPct = founderCount ? (activeFounders / founderCount * 100).toFixed(
+                    2) : 0; let activeBuyerPct = buyerCount ? (activeBuyers / buyerCount * 100).toFixed(2) : 0; let
+                founderSharePct = totalMoney ? (founderMoney / totalMoney * 100).toFixed(2) : 0; let buyerSharePct =
+                totalMoney ? (buyerMoney / totalMoney * 100).toFixed(2) : 0;
+            document.getElementById('analysisResults').innerHTML =
+                `<div class="analysis-item"><div class="analysis-percent">${founderPct}%/${buyerPct}%</div><div class="analysis-label">መስራች/ገዝቶ (ብዛት)</div></div><div class="analysis-item"><div class="analysis-percent">${activeFounderPct}%/${activeBuyerPct}%</div><div class="analysis-label">ክፍያ የከፈሉ</div></div><div class="analysis-item"><div class="analysis-percent">${founderSharePct}%/${buyerSharePct}%</div><div class="analysis-label">የመዋጮ ድርሻ</div></div>`;
+            if (analysisChart) analysisChart.destroy();
+            analysisChart = new Chart(document.getElementById('analysisPieChart').getContext('2d'), { type: 'pie',
+                data: { labels: ['መስራች', 'ገዝቶ'], datasets: [{ data: [founderMoney, buyerMoney],
+                        backgroundColor: ['#1a472a', '#ff9800'] }] }, options: { responsive: true } });
+            window.lastAnalysisData = { societyLabel: society === 'all' ? 'ሁሉም' : (society === 'Wazema' ? 'ዋዜሜ' :
+                    'ፕላኔት'), founderPct, buyerPct, activeFounderPct, activeBuyerPct, founderSharePct,
+                buyerSharePct }; }
+
+        function printAnalysisReport() { if (!window.lastAnalysisData) runAnalysis(); let d = window.lastAnalysisData; let
+        html =
+            `<div class="print-header"><h2>${d.societyLabel} - የማህበር ትንተና ሪፖርት</h2></div><div class="analysis-stats"><div class="analysis-item">መስራች/ገዝቶ(ብዛት):${d.founderPct}%/${d.buyerPct}%</div><div class="analysis-item">ክፍያ የከፈሉ:${d.activeFounderPct}%/${d.activeBuyerPct}%</div><div class="analysis-item">የመዋጮ ድርሻ:${d.founderSharePct}%/${d.buyerSharePct}%</div></div><div><img src="${document.getElementById('analysisPieChart').toDataURL()}"style="max-width:100%"></div>`;
+        doPrint(html); }
+
+        function toggleAnalysisCard() { let c = document.getElementById('analysisContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) runAnalysis(); }
+
+        function updatePurchaseAnalysis() { let totalCost = calculateTotalCost(); let analysisHtml =
+            '<div class="analysis-item"><div class="analysis-label">ጠቅላላ የግንባታ ወጪ</div>' + formatDecimal(totalCost) +
+            ' ብር</div>'; for (let cat of materialTypes) { let catTotal = 0; for (let i of(materials[cat] || [])) catTotal += i
+                .total || 0; let percent = totalCost ? (catTotal / totalCost * 100).toFixed(2) : 0;
+            analysisHtml +=
+                `<div class="analysis-item"><div class="analysis-label">${typeLabels[cat]}</div>${formatDecimal(catTotal)} ብር (${percent}%)</div>`; }
+            document.getElementById('purchaseAnalysisStats').innerHTML = analysisHtml; }
+
+        function updateRefundAnalysis() { let totalContrib = 0; for (let mid in contributions)
+            for (let c of contributions[mid]) totalContrib += c.amount; let totalRefund = separatedMembers.reduce((s, sep) => s + (
+                (sep.savedTotal || 0) + (sep.bonus || 0)), 0); let percent = totalContrib ? (totalRefund / totalContrib * 100)
+                .toFixed(2) : 0;
+            document.getElementById('refundAnalysisStats').innerHTML =
+                `<div class="analysis-item"><div class="analysis-label">ጠቅላላ የአባላት መዋጮ</div>${formatDecimal(totalContrib)} ብር</div><div class="analysis-item"><div class="analysis-label">ለተሰናበቱ የተመለሰ ገንዘብ</div>${formatDecimal(totalRefund)} ብር (${percent}%)</div>`; }
+
+        function updateFinancialSource() { let totalContrib = 0; for (let mid in contributions)
+            for (let c of contributions[mid]) totalContrib += c.amount; let totalConst = calculateTotalCost(); let totalRefund =
+                separatedMembers.reduce((s, sep) => s + ((sep.savedTotal || 0) + (sep.bonus || 0)), 0); let totalWork =
+                workPayments.reduce((s, wp) => s + wp.amount, 0); let constPercent = totalContrib ? (totalConst / totalContrib *
+                    100).toFixed(2) : 0; let refundPercent = totalContrib ? (totalRefund / totalContrib * 100).toFixed(2) :
+                0; let workPercent = totalContrib ? (totalWork / totalContrib * 100).toFixed(2) : 0; let remaining =
+                totalContrib - totalConst - totalRefund - totalWork;
+            document.getElementById('financialSourceStats').innerHTML =
+                `<div class="analysis-item"><div class="analysis-label">ጠቅላላ መዋጮ(ምንጭ)</div>${formatDecimal(totalContrib)} ብር</div><div class="analysis-item"><div class="analysis-label">ለግዥ የወጣ</div>${formatDecimal(totalConst)} ብር(${constPercent}%)</div><div class="analysis-item"><div class="analysis-label">ለተሰናበቱ ተመላሽ</div>${formatDecimal(totalRefund)} ብር(${refundPercent}%)</div><div class="analysis-item"><div class="analysis-label">የስራ ማስኪጃ</div>${formatDecimal(totalWork)} ብር(${workPercent}%)</div><div class="analysis-item"><div class="analysis-label">ቀሪ</div>${formatDecimal(remaining)} ብር</div>`; }
+
+        function togglePurchaseAnalysis() { let c = document.getElementById('purchaseAnalysisContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) { updatePurchaseAnalysis();
+            updateRefundAnalysis();
+            updateFinancialSource(); } }
+
+        function updateActiveMemberDropdown() { let dropdown = document.getElementById('sepMemberSelect'); if (dropdown)
+            dropdown.innerHTML = '<option value="">-- አባል ይምረጡ --</option>' + membersList.map(m =>
+                `<option value="${m.id}">${m.id} - ${m.name}(${m.membershipType})</option>`).join(''); }
+
+        function populateSepFields() { let id = document.getElementById('sepMemberSelect').value; if (!id) return; let member =
+            membersList.find(m => m.id === id); if (member) { document.getElementById('sepName').value = member.name;
+            document.getElementById('sepGender').value = member.gender;
+            document.getElementById('sepAddress').value = member.address;
+            document.getElementById('sepPhone').value = member.phone;
+            document.getElementById('sepAssociationGivenName').value = member.associationGivenName || '';
+            document.getElementById('sepSharesOwned').value = member.shares; let saved = (contributions[member.id] || [])
+                .reduce((s, c) => s + c.amount, 0);
+            document.getElementById('sepSavedTotal').value = saved;
+            document.getElementById('sepBonus').value = 0;
+            document.getElementById('sepDate').value = new Date().toISOString().slice(0, 10); } }
+
+        function toggleNoticeDate() { let reason = document.getElementById('sepReason').value;
+            document.getElementById('noticeDateDiv').style.display = reason === 'own' ? 'block' : 'none'; }
+
+        function registerSeparatedMember() { if (currentUser.role !== 'admin') return; let memberId = document.getElementById(
+                'sepMemberSelect').value; if (!memberId) return alert("አባል ይምረጡ"); let member = membersList.find(m => m.id ===
+                memberId); if (!member) return alert("አባል አልተገኘም"); let savedTotal = parseFloat(document.getElementById(
+                'sepSavedTotal').value) || 0; let bonus = parseFloat(document.getElementById('sepBonus').value) || 0; let
+            reason = document.getElementById('sepReason').value; let noticeDate = reason === 'own' ? document.getElementById(
+                'sepNoticeDate').value : ''; let separationDate = document.getElementById('sepDate').value; if (!
+                separationDate) return alert("የስንብት ቀን ያስገቡ"); let newSep = { memberId: member.id, membershipType: member
+                    .membershipType, name: member.name, gender: member.gender, address: member.address, phone: member
+                    .phone, associationGivenName: member.associationGivenName, shares: member.shares, savedTotal: savedTotal,
+                bonus: bonus, totalAmount: savedTotal + bonus, separationDate: separationDate, reason: reason,
+                noticeDate: noticeDate, shareholderStatus: member.shareholderStatus, refunds: [] };
+            separatedMembers.push(newSep); let idx = membersList.findIndex(m => m.id === memberId); if (idx !== -1) membersList
+                .splice(idx, 1);
+            saveSeparatedMembers();
+            saveMembers();
+            renderSeparatedList();
+            updateSeparationStats();
+            updateActiveMemberDropdown();
+            updateSepRefundSelect();
+            updateWarningEncouragement();
+            alert("አባሉ በተሳካ ሁኔታ ተሰናብቷል");
+            updateFinancialSource(); }
+
+        function renderSeparatedList() { let start = document.getElementById('sepListStart').value,
+                end = document.getElementById('sepListEnd').value; let filtered = separatedMembers.filter(s => (!start || s
+                    .separationDate >= start) && (!end || s.separationDate <= end)); let html =
+                `<table class="data-table"><thead><th>ማህበር</th><th>ስም</th><th>አድራሻ</th><th>ስልክ</th><th>እጣ</th><th>የቆጠቡት</th><th>ቦነስ</th><th>ጠቅላላ</th><th>ቀን</th><th>ድርጊት</th></thead><tbody>`;
+            filtered.forEach((s, idx) => { let total = (s.savedTotal || 0) + (s.bonus || 0);
+                html +=
+                    `<tr><td class="green-bold">${s.membershipType}</td><td class="green-bold">${s.name}</td><td class="green-bold">${s.address}</td><td class="green-bold">${s.phone}</td><td class="green-bold">${s.shares}</td><td class="green-bold">${(s.savedTotal||0).toLocaleString()} ብር</td><td class="green-bold">${(s.bonus||0).toLocaleString()} ብር</td><td class="green-bold">${total.toLocaleString()} ብር</td><td class="green-bold">${s.separationDate}</td><td><button class="btn-sm btn-danger" onclick="deleteSeparatedMember(${idx})">ሰርዝ</button></td></tr>`; });
+            html += `</tbody></table>`;
+            document.getElementById('separatedListContainer').innerHTML = html; }
+
+        function deleteSeparatedMember(idx) { if (confirm("ማጥፋት?")) { separatedMembers.splice(idx, 1);
+                saveSeparatedMembers();
+                renderSeparatedList();
+                updateSeparationStats();
+                updateSepRefundSelect();
+                updateWarningEncouragement();
+                updateFinancialSource(); } }
+
+        function updateSeparationStats() { let filter = document.querySelector('input[name="sepFilter"]:checked')?.value ||
+                'all'; let start = document.getElementById('sepStatsStart').value,
+                end = document.getElementById('sepStatsEnd').value, month = document.getElementById('sepStatsMonth').value,
+                year = document.getElementById('sepStatsYear').value; let filtered = separatedMembers.filter(s => { if (
+                    filter !== 'all' && s.membershipType !== filter) return false; if (start && s.separationDate < start)
+                    return false; if (end && s.separationDate > end) return false; if (month && !s.separationDate
+                    .startsWith(month)) return false; if (year && s.separationDate.split('-')[0] !== year) return false;
+                return true; }); let sepCount = filtered.length, sepMale = filtered.filter(s => s.gender === 'ወንድ').length,
+                sepFemale = sepCount - sepMale; let sharesSum = filtered.reduce((s, v) => s + (v.shares || 0), 0); let
+                totalPaid = filtered.reduce((s, v) => s + ((v.savedTotal || 0) + (v.bonus || 0)), 0); let returnedShares =
+                filtered.reduce((s, v) => s + (v.sharesToTransfer || 0), 0); let active = membersList;
+            document.getElementById('separatedCount').innerText = sepCount;
+            document.getElementById('sepMale').innerText = sepMale;
+            document.getElementById('sepFemale').innerText = sepFemale;
+            document.getElementById('separatedSharesSum').innerText = sharesSum;
+            document.getElementById('separatedTotalPaid').innerText = totalPaid.toLocaleString();
+            document.getElementById('totalReturnedShares').innerText = returnedShares;
+            document.getElementById('activeMembersCount').innerText = active.length;
+            document.getElementById('activeMale').innerText = active.filter(m => m.gender === 'ወንድ').length;
+            document.getElementById('activeFemale').innerText = active.filter(m => m.gender === 'ሴት').length; if (sepCount >
+                0) { let founders = filtered.filter(s => s.shareholderStatus === 'founder').length; let buyers = sepCount -
+                    founders; let maleSep = sepMale,
+                    femaleSep = sepFemale; let founderMale = filtered.filter(s => s.shareholderStatus === 'founder' && s
+                        .gender === 'ወንድ').length; let founderFemale = founders - founderMale; let buyerMale = filtered
+                    .filter(s => s.shareholderStatus === 'buyer' && s.gender === 'ወንድ').length; let buyerFemale = buyers -
+                    buyerMale; let analysisHtml =
+                    `<div class="analysis-item"><div class="analysis-label">ጾታ(ወ/ሴ)</div>${maleSep}(${((maleSep/sepCount)*100).toFixed(1)}%)/${femaleSep}(${((femaleSep/sepCount)*100).toFixed(1)}%)</div><div class="analysis-item"><div class="analysis-label">መስራች(ወ/ሴ/ድምር)</div>${founderMale}/${founderFemale}/${founders}(${((founders/sepCount)*100).toFixed(1)}%)</div><div class="analysis-item"><div class="analysis-label">ገዝቶ የገባ(ወ/ሴ/ድምር)</div>${buyerMale}/${buyerFemale}/${buyers}(${((buyers/sepCount)*100).toFixed(1)}%)</div>`;
+                document.getElementById('separatedAnalysisContainer').innerHTML = analysisHtml; } else { document
+                    .getElementById('separatedAnalysisContainer').innerHTML =
+                    '<div class="analysis-item">ምንም የተሰናበቱ የሉም</div>'; } }
+
+        function exportSeparatedToExcel() { let wsData = [
+                ["ማህበር", "ስም", "እጣ", "የቆጠቡት", "ቦነስ", "ጠቅላላ", "ቀን"]
+            ];
+            separatedMembers.forEach(s => { let total = (s.savedTotal || 0) + (s.bonus || 0);
+                wsData.push([s.membershipType, s.name, s.shares, s.savedTotal || 0, s.bonus || 0, total, s.separationDate]); });
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "Separated");
+            XLSX.writeFile(wb, `Separated_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        function printSeparatedList() { let content = document.getElementById('separatedListContainer').innerHTML;
+            doPrint("<h2>የተሰናበቱ አባላት ዝርዝር</h2>" + content); }
+
+        function exportSeparationStatsExcel() { let filter = document.querySelector('input[name="sepFilter"]:checked')?.value ||
+                'all'; let start = document.getElementById('sepStatsStart').value,
+                end = document.getElementById('sepStatsEnd').value, month = document.getElementById('sepStatsMonth').value,
+                year = document.getElementById('sepStatsYear').value; let filtered = separatedMembers.filter(s => { if (
+                    filter !== 'all' && s.membershipType !== filter) return false; if (start && s.separationDate < start)
+                    return false; if (end && s.separationDate > end) return false; if (month && !s.separationDate
+                    .startsWith(month)) return false; if (year && s.separationDate.split('-')[0] !== year) return false;
+                return true; }); let wsData = [
+                ["ማህበር", "ስም", "ጾታ", "አክሲዮን", "የተከፈለ", "የተመለሰ አክሲዮን", "ቀን"]
+            ];
+            filtered.forEach(s => wsData.push([s.membershipType, s.name, s.gender, s.shares, (s.savedTotal || 0) + (s.bonus || 0),
+                s.sharesToTransfer || 0, s.separationDate
+            ])); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "Separation Stats");
+            XLSX.writeFile(wb, `SeparationStats_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        function printSeparationStats() { let content = document.getElementById('sepStatsContent').cloneNode(true); let win =
+            window.open('', '_blank');
+            win.document.write(`<html><body><h2>የስንብት ሪፖርት</h2>${content.innerHTML}</body></html>`);
+            win.document.close();
+            win.print(); }
+
+        function showDefaulters() { let month = document.getElementById('defaulterMonth').value,
+                type = document.getElementById('defaulterContributionType').value; if (!month) return alert("ወር ምረጥ"); let
+                def = []; for (let m of membersList) { let contribs = contributions[m.id] || []; let paid = (type === 'both') ?
+                    contribs.some(c => c.month === month) : contribs.some(c => c.month === month && c.type === type); if (!
+                        paid) def.push(m); } let html =
+                `<table class="data-table"><thead><th>አይዲ</th><th>ስም</th><th>ጾታ</th><th>ስልክ</th><th>አድራሻ</th><th>ማህበር</th><th>የአክሲዮን ባለቤትነት</th></thead><tbody>` +
+                def.map(d =>
+                    `<tr><td class="green-bold">${d.id}</td><td class="green-bold">${d.name}</td><td class="green-bold">${d.gender}</td><td class="green-bold">${d.phone}</td><td class="green-bold">${d.address}</td><td class="green-bold">${d.membershipType}</td><td class="green-bold">${d.shareholderStatus==='founder'?'መስራች':'ገዝቶ'}</td></tr>`
+                    ).join('') + `</tbody></table>`;
+            document.getElementById('defaultersResults').innerHTML = html;
+            window.currentDefaultersList = def; let total = def.length; if (total > 0) { let male = def.filter(d => d.gender ===
+                    'ወንድ').length; let female = total - male; let founders = def.filter(d => d.shareholderStatus ===
+                    'founder').length; let buyers = total - founders; let founderMale = def.filter(d => d
+                    .shareholderStatus === 'founder' && d.gender === 'ወንድ').length; let founderFemale = founders -
+                    founderMale; let buyerMale = def.filter(d => d.shareholderStatus === 'buyer' && d.gender === 'ወንድ')
+                    .length; let buyerFemale = buyers - buyerMale; let analysisHtml =
+                    `<div class="analysis-item"><div class="analysis-label">ጾታ(ወ/ሴ)</div>${male}(${((male/total)*100).toFixed(1)}%)/${female}(${((female/total)*100).toFixed(1)}%)</div><div class="analysis-item"><div class="analysis-label">መስራች(ወ/ሴ/ድምር)</div>${founderMale}/${founderFemale}/${founders}(${((founders/total)*100).toFixed(1)}%)</div><div class="analysis-item"><div class="analysis-label">ገዝቶ የገባ(ወ/ሴ/ድምር)</div>${buyerMale}/${buyerFemale}/${buyers}(${((buyers/total)*100).toFixed(1)}%)</div>`;
+                document.getElementById('defaulterAnalysisContainer').innerHTML = analysisHtml; } else { document
+                    .getElementById('defaulterAnalysisContainer').innerHTML =
+                    '<div class="analysis-item">ማንም አልከፈለም</div>'; } }
+
+        function exportDefaultersToExcel() { if (!window.currentDefaultersList) return alert("መጀመሪያ አሳይ ይጫኑ"); let wsData = [
+                ["አይዲ", "ስም", "ጾታ", "ስልክ", "አድራሻ", "ማህበር"]
+            ];
+            window.currentDefaultersList.forEach(d => wsData.push([d.id, d.name, d.gender, d.phone, d.address, d
+                .membershipType
+            ])); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "Defaulters");
+            XLSX.writeFile(wb, `Defaulters_${document.getElementById('defaulterMonth').value}.xlsx`); }
+
+        function printDefaulters() { let content = document.getElementById('defaultersResults').innerHTML;
+            doPrint("<h2>ያልከፈሉ አባላት ሪፖርት</h2>" + content); }
+
+        function updateAnnounceUI() { let container = document.getElementById('announcementList'); if (container) container
+                .innerHTML = announcements.map((a, i) =>
+                    `<div>${a.content}<button class="btn-sm btn-danger"onclick="deleteAnnounce(${i})">ሰርዝ</button></div>`).join(
+                    ''); let marquee = document.getElementById('movingAnnounce'); if (marquee) marquee.innerText = announcements[
+                    0] ? announcements[0].content : "ምንም አዲስ ማስታወቂያ የለም"; }
+
+        function addAnnouncement() { let txt = document.getElementById('newAnnounceText').value.trim(); if (txt) { announcements
+                .unshift({ content: txt, date: new Date().toISOString() });
+                saveAnnouncements();
+                document.getElementById('newAnnounceText').value = ''; } }
+
+        function deleteAnnounce(i) { announcements.splice(i, 1);
+            saveAnnouncements(); }
+
+        function toggleAnnouncements() { document.getElementById('announcementsContent').classList.toggle('show');
+            updateAnnounceUI(); }
+
+        function toggleAdminContributionPanel() { document.getElementById('adminContributionContent').classList.toggle(
+        'show'); }
+
+        function toggleContributionReport() { let c = document.getElementById('contributionReportContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) filterContributionReportAndChart(); }
+
+        function toggleMemberList() { let c = document.getElementById('memberListContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) renderMemberListTable(); }
+
+        function toggleMemberMgmt() { document.getElementById('memberMgmtContent').classList.toggle('show'); }
+
+        function toggleSeparatedRegistration() { document.getElementById('separatedRegContent').classList.toggle('show'); }
+
+        function toggleSeparatedList() { let c = document.getElementById('separatedListContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) renderSeparatedList(); }
+
+        function toggleSeparationStats() { let c = document.getElementById('sepStatsContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) updateSeparationStats(); }
+
+        function toggleDefaulters() { document.getElementById('defaultersContent').classList.toggle('show'); }
+
+        function togglePurchaseFields() { let status = document.querySelector('input[name="shareholderStatus"]:checked').value;
+            document.getElementById('purchaseInfoFields').style.display = status === 'buyer' ? 'flex' : 'none'; }
+
+        function handleMemberSearchDebounced() { if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout);
+            searchDebounceTimeout = setTimeout(() => renderMemberListTable(), 300); }
+
+        function toggleSharePriceCard() { let c = document.getElementById('sharePriceContent');
+            c.classList.toggle('show'); }
+
+        function renderMemberAnalysisCard() { renderMemberListAnalysis(); let shareCounts = {}; for (let m of membersList) { let
+                s = Math.min(m.shares || 0, 6);
+                shareCounts[s] = shareCounts[s] || { total: 0, male: 0, female: 0 };
+                shareCounts[s].total++; if (m.gender === 'ወንድ') shareCounts[s].male++;
+            else shareCounts[s].female++; } let html = ''; for (let i = 1; i <= 6; i++) { let d = shareCounts[i] || { total: 0,
+                    male: 0, female: 0 };
+                html +=
+                    `<div class="analysis-item"><div class="analysis-label">${i} አክሲዮን</div><div>ድምር:${d.total}(ወ:${d.male}/ሴ:${d.female})</div></div>`; }
+            document.getElementById('memberAnalysisSharesContainer').innerHTML =
+            `<div class="analysis-stats">${html}</div>`; }
+
+        function toggleMemberAnalysisCard() { let c = document.getElementById('memberAnalysisCardContent');
+            c.classList.toggle('show'); if (c.classList.contains('show')) renderMemberAnalysisCard(); }
+
+        function exportMemberAnalysisToExcel() { let shareDiv = document.getElementById('memberAnalysisSharesContainer')
+            .innerHTML; let analysisDiv = document.getElementById('memberAnalysisContainer').innerHTML; let tempDiv = document
+            .createElement('div');
+            tempDiv.innerHTML = shareDiv + analysisDiv; let items = tempDiv.querySelectorAll('.analysis-item'); let data = [
+                ['የትንተና ዓይነት', 'ውጤት']
+            ];
+            items.forEach(item => { let label = item.querySelector('.analysis-label')?.innerText || ''; let value = item
+                    .innerText.replace(label, '').trim();
+                data.push([label, value]); }); let ws = XLSX.utils.aoa_to_sheet(data); let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Member Analysis");
+            XLSX.writeFile(wb, `member_analysis_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        function exportMemberAnalysisToPDF() { let analysisDiv = document.getElementById('memberAnalysisCardContent')
+            .cloneNode(true); let win = window.open('', '_blank');
+            win.document.write(
+                `<html><head><style>body{font-family:sans-serif;}.analysis-item{border:1px solid #ccc;padding:10px;margin:5px;}</style></head><body><h2>የአባላት ትንተና</h2>${analysisDiv.innerHTML}</body></html>`
+                );
+            win.document.close();
+            win.print(); }
+
+        function printMemberAnalysis() { doPrint(
+                `<h2 class="bold-text">የአባላት ትንተና(Member Analysis)</h2>${document.getElementById('memberAnalysisCardContent').innerHTML}`
+                ); }
+
+        let currentRemainingFilteredMembers = [];
+
+        function applyRemainingFilter() { let amount = parseFloat(document.getElementById('remainingFilterAmount').value) ||
+            0; let society = document.getElementById('remainingFilterSociety').value; let status = document.getElementById(
+                'remainingFilterStatus').value;
+            currentRemainingFilteredMembers = membersList.filter(m => { if (society !== 'all' && m.membershipType !==
+                    society) return false; if (status !== 'all' && m.shareholderStatus !== status) return false; return
+                    getRemainingForMember(m) >= amount; });
+            renderRemainingTable(currentRemainingFilteredMembers); }
+
+        function renderRemainingTable(list) { let html =
+                `<table class="data-table"><thead><th>ምረጥ</th><th>ስም</th><th>አይዲ</th><th>ማህበር</th><th>አክሲዮን</th><th>የሚጠበቅ</th><th>የተከፈለ</th><th>ቀሪ</th></thead><tbody>`;
+            list.forEach(m => { let expected = getExpectedTotalForMember(m),
+                    paid = getPaidTotalForMember(m.id), remaining = expected - paid;
+                html +=
+                    `<tr><td><input type="checkbox" class="remain-check" data-id="${m.id}"></td><td class="green-bold">${m.name}</td><td class="green-bold">${m.id}</td><td class="green-bold">${m.membershipType}</td><td>${m.shares}</td><td class="green-bold">${formatDecimal(expected)}</td><td class="green-bold">${formatDecimal(paid)}</td><td class="green-bold">${formatDecimal(remaining)}</td></tr>`; });
+            html += `</tbody></table>`;
+            document.getElementById('remainingFilterResults').innerHTML = list.length ? html :
+                "ከዚህ ቀሪ ክፍያ ጋር የሚስማማ አባል አልተገኘም"; }
+
+        function getSelectedRemainingMembers() { let checkboxes = document.querySelectorAll('.remain-check:checked'); let ids =
+            Array.from(checkboxes).map(cb => cb.getAttribute('data-id')); return currentRemainingFilteredMembers.filter(m =>
+                ids.includes(m.id)); }
+
+        function printSelectedRemaining() { let selected = getSelectedRemainingMembers(); if (selected.length === 0) return alert(
+                "እባክዎ ቢያንስ አንድ አባል ይምረጡ");
+            printRemainingMembers(selected); }
+
+        function printAllRemainingFiltered() { if (currentRemainingFilteredMembers.length === 0) return alert(
+                "ምንም አባል አልተገኘም");
+            printRemainingMembers(currentRemainingFilteredMembers); }
+
+        function printRemainingMembers(list) { let rows = list.map((m, idx) => { let expected =
+                getExpectedTotalForMember(m), paid = getPaidTotalForMember(m.id), remaining = expected - paid; return `<tr><td>${idx+1}</td><td>${m.name}</td><td>${m.id}</td><td>${m.phone}</td><td>${m.associationGivenName||'-'}</td><td>${m.shares}</td><td>${formatDecimal(expected)}</td><td>${formatDecimal(paid)}</td><td>${formatDecimal(remaining)}</td></tr>`; })
+            .join('');
+            doPrint(
+                `<div class="print-header"><h2>የቀሪ ክፍያ ሪፖርት(≥)</h2></div><table class="print-table"><thead><th>ተራ</th><th>ስም</th><th>አይዲ</th><th>ስልክ</th><th>መጠሪያ</th><th>አክሲዮን</th><th>የሚጠበቅ</th><th>የተከፈለ</th><th>ቀሪ</th></thead><tbody>${rows}</tbody></table>`
+                ); }
+
+        function exportRemainingToExcel() { if (currentRemainingFilteredMembers.length === 0) return alert(
+                "ምንም ውሂብ የለም"); let wsData = [
+                ["ስም", "አይዲ", "ማህበር", "አክሲዮን", "የሚጠበቅ", "የተከፈለ", "ቀሪ"]
+            ];
+            currentRemainingFilteredMembers.forEach(m => { let expected = getExpectedTotalForMember(m),
+                    paid = getPaidTotalForMember(m.id);
+                wsData.push([m.name, m.id, m.membershipType, m.shares, expected, paid, getRemainingForMember(m)]); }); let wb =
+                XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wsData), "RemainingFilter");
+            XLSX.writeFile(wb, `remaining_filter_${new Date().toISOString().slice(0,10)}.xlsx`); }
+
+        function toggleRemainingFilter() { document.getElementById('remainingFilterContent').classList.toggle('show'); }
+
+        function setRole(r) { window.currentRole = r;
+            document.getElementById('adminTypeBtn').classList.toggle('active', r === 'admin');
+            document.getElementById('memberTypeBtn').classList.toggle('active', r === 'member'); }
+
+        function togglePass() { let inp = document.getElementById('loginPass');
+            inp.type = inp.type === 'password' ? 'text' : 'password'; }
+
+        function updateContributionReportMemberSelect() { let sel = document.getElementById('reportMemberSelect'); if (sel) sel
+                .innerHTML = '<option value="all">ሁሉም አባላት</option>' + membersList.map(m =>
+                    `<option value="${m.id}">${m.id} - ${m.name}</option>`).join(''); }
+
+        async function loadDataAndStartApp() {
+            try {
+                let [mS, cS, cnS, aS, sS, wpS, stS] = await Promise.all([database.ref('/members').once('value'), database.ref(
+                        '/contributions').once('value'), database.ref('/construction').once('value'), database.ref(
+                        '/announcements').once('value'), database.ref('/separatedMembers').once('value'), database.ref(
+                        '/workPayments').once('value'), database.ref('/shareTransfers').once('value')]);
+                if (mS.exists()) membersList = mS.val().list || [];
+                if (cS.exists()) contributions = cS.val() || {};
+                if (cnS.exists()) materials = cnS.val();
+                if (aS.exists()) announcements = aS.val() || [];
+                if (sS.exists()) separatedMembers = sS.val() || [];
+                if (wpS.exists()) workPayments = wpS.val() || [];
+                if (stS.exists()) shareTransfers = stS.val() || [];
+                for (let cat of materialTypes)
+                    if (!Array.isArray(materials[cat])) materials[cat] = [];
+                await loadSharePrice();
+                renderConstructionSummary();
+                renderMaterialNav();
+                updateAnnounceUI();
+                filterContributionReportAndChart();
+                renderMemberListTable();
+                renderSeparatedList();
+                renderShareTransferList();
+                updateSeparationStats();
+                runAnalysis();
+                updateActiveMemberDropdown();
+                updateSepRefundSelect();
+                updateWorkMemberSelect();
+                updatePurchaseAnalysis();
+                updateRefundAnalysis();
+                updateFinancialSource();
+                updateSharePriceDisplay();
+                updateExpectedTotals();
+                updateWarningEncouragement();
+                let today = new Date(),
+                    firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1).toISOString().slice(0, 10),
+                    lastDay = today.toISOString().slice(0, 10);
+                document.getElementById('contributionDate').value = today.toISOString().slice(0, 10);
+                document.getElementById('reportStartDate').value = firstDay;
+                document.getElementById('reportEndDate').value = lastDay;
+                document.getElementById('purchaseReportStart').value = firstDay;
+                document.getElementById('purchaseReportEnd').value = lastDay;
+                document.getElementById('analysisStartDate').value = firstDay;
+                document.getElementById('analysisEndDate').value = lastDay;
+                document.getElementById('stTransferDate').value = today.toISOString().slice(0, 10);
+                let catBtns = '';
+                for (let cat of ['all', 'iron', 'nail', 'cement', 'gravel', 'ash', 'others'])
+                    catBtns +=
+                    `<button class="category-btn ${cat==='all'?'active':''}" data-cat="${cat}" onclick="setPurchaseCategory('${cat}')">${cat==='all'?'ሁሉም':typeLabels[cat]}</button>`;
+                document.getElementById('purchaseCatButtons').innerHTML = catBtns;
+                if (currentUser.role === 'admin') {
+                    document.getElementById('userBadge').innerHTML =
+                    '<i class="fas fa-user-shield"></i> አድሚን';
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                    document.querySelectorAll('.member-only').forEach(el => el.style.display = 'none');
+                    document.getElementById('memberPersonalPanelOutside').style.display = 'none';
+                    document.getElementById('memberStatusMessage').style.display = 'none';
+                    document.getElementById('memberIdDisplay').style.display = 'none';
+                    document.getElementById('memberAIPanel').style.display = 'none';
+                    document.getElementById('adminAIPanel').style.display = 'block';
+                } else {
+                    document.getElementById('userBadge').innerHTML = '<i class="fas fa-user"></i> አባል';
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('.member-only').forEach(el => el.style.display = 'block');
+                    document.getElementById('memberPersonalPanelOutside').style.display = 'block';
+                    document.getElementById('memberIdDisplay').style.display = 'block';
+                    document.getElementById('memberStatusMessage').style.display = 'block';
+                    document.getElementById('memberAIPanel').style.display = 'block';
+                    document.getElementById('adminAIPanel').style.display = 'none';
+                    let member = membersList.find(m => m.id === currentUser.memberId);
+                    if (member) {
+                        document.getElementById('memberIdShown').innerText = member.id;
+                        document.getElementById('currentMemberName').innerText = member.name;
+                        document.getElementById('currentMemberId').innerText = member.id;
+                        document.getElementById('currentMemberGender').innerText = member.gender;
+                        document.getElementById('currentMemberAssociation').innerText = member.membershipType ===
+                            'Wazema' ? 'ዋዜማ አፓርትመንት አክሲዮን ማህበር' : 'ፕላኔት አፓርትመንት አክሲዮን ማህበር';
+                        document.getElementById('currentMemberStatus').innerText = member.shareholderStatus ===
+                            'founder' ? 'መስራች' : 'ገዝቶ የገባ';
+                        document.getElementById('currentMemberShares').innerText = member.shares;
+                        document.getElementById('currentMemberPhone').innerText = member.phone;
+                        document.getElementById('currentMemberAddress').innerText = member.address;
+                        let buyerDiv = document.getElementById('memberBuyerExtraInfo');
+                        if (member.shareholderStatus === 'buyer') {
+                            buyerDiv.style.display = 'block';
+                            buyerDiv.innerHTML =
+                                `<strong>ገዝቶ የገባ መረጃ:</strong><br>ከማን ገዛ: ${member.purchasedFrom||'አልተገለጸም'}<br>የግዢ ቀን: ${member.purchaseDate||'አልተገለጸም'}<br>የተላለፈለት ብር: ${formatDecimal(getPaidTotalForMember(member.id))}`;
+                        } else { buyerDiv.style.display = 'none'; }
+                        let reg = (contributions[member.id] || []).filter(c => c.type === 'regular').reduce((s, c) =>
+                            s + c.amount, 0),
+                            spec = (contributions[member.id] || []).filter(c => c.type === 'special').reduce((s, c) =>
+                                s + c.amount, 0);
+                        let expected = getExpectedTotalForMember(member),
+                            paid = reg + spec,
+                            remaining = expected - paid;
+                        document.getElementById('memberRegularTotal').innerText = reg.toLocaleString();
+                        document.getElementById('memberSpecialTotal').innerText = spec.toLocaleString();
+                        document.getElementById('memberTotalContribution').innerText = paid.toLocaleString();
+                        document.getElementById('memberExpected').innerText = formatDecimal(expected);
+                        document.getElementById('memberRemaining').innerText = formatDecimal(remaining);
+                        updateMemberStatusMessage();
+                        let reportSelect = document.getElementById('reportMemberSelect');
+                        if (reportSelect) reportSelect.value = member.id;
+                    }
+                }
+                renderMemberAnalysisCard();
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+            } catch (e) { console.error(e);
+                document.getElementById('loginErrorMsg').innerHTML = "መረጃ መጫን አልተቻለም"; } finally { document.getElementById(
+                    'loginLoaderContainer').style.display = 'none'; }
+        }
+
+        async function handleLogin() { let pwd = document.getElementById('loginPass').value.trim(); if (!pwd) return document
+                .getElementById('loginErrorMsg').innerHTML = "ኮድ ያስገቡ";
+            document.getElementById('loginLoaderContainer').style.display = 'block';
+            document.getElementById('loginErrorMsg').innerHTML = ''; if (window.currentRole === 'admin') { if (pwd ===
+                    'admin123') { currentUser = { role: 'admin', memberId: null };
+                    loadDataAndStartApp(); } else { document.getElementById('loginLoaderContainer').style.display =
+                    'none';
+                document.getElementById('loginErrorMsg').innerHTML = 'የአድሚን ፓስዎርድ ተሳስቷል'; } } else { try { let found =
+                    membersList.find(m => m.id === pwd); if (found) { currentUser = { role: 'member', memberId: found.id
+                        };
+                        loadDataAndStartApp(); return; } let snap = await database.ref('/members').once('value'); let
+                    allMembers = snap.exists() ? (snap.val().list || []) : [];
+                    found = allMembers.find(m => m.id === pwd); if (found) { membersList = allMembers;
+                        currentUser = { role: 'member', memberId: found.id };
+                        loadDataAndStartApp(); } else { document.getElementById('loginLoaderContainer').style.display =
+                            'none';
+                        document.getElementById('loginErrorMsg').innerHTML = 'የአባል አይዲ ተሳስቷል'; } } catch (e) { document
+                        .getElementById('loginLoaderContainer').style.display = 'none';
+                    document.getElementById('loginErrorMsg').innerHTML = 'የመረጃ ቋት ስህተት፤ እባክዎ ደግመው ይሞክሩ'; } }
+        }
+
+        function logout() { location.reload(); }
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => { let tab = btn.getAttribute(
+                'data-tab');
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById(tab + 'Pane').classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active'); if (tab === 'members') { filterContributionReportAndChart();
+                renderMemberListTable(); } else filterPurchaseReport(); }));
+        document.getElementById('totalCostBox')?.addEventListener('click', () => { let p = document.getElementById(
+                'detailedReportPanel');
+            p.style.display = p.style.display === 'none' ? 'block' : 'none'; });
+        if (materials.iron.length === 0) { materials.iron.push({ receiptNo: "INV-001", date: "2024-01-10", type: "10ሚሜ",
+            quantity: 25, unit: "ቤርጋ", pricePerUnit: 1200, total: 30000, supplier: "አቅራቢ" });
+            renderConstructionSummary();
+            renderMaterialNav(); }
+        if (membersList.length === 0) { membersList.push({ id: "W-1001", name: "አለማየሁ ተስፋዬ", phone: "0912345678",
+                shares: 5, address: "አዲስ አበባ", gender: "ወንድ", membershipType: "Wazema", shareholderStatus: "founder",
+                associationGivenName: "ዋዜሜ አንድ" });
+            membersList.push({ id: "P-1002", name: "ሰላም አበበ", phone: "0922334455", shares: 3, address: "ባህር ዳር",
+                gender: "ሴት", membershipType: "Planet", shareholderStatus: "buyer", associationGivenName: "ፕላኔት አንድ",
+                purchasedFrom: "አበበ በቀለ", purchaseDate: "2023-01-15" });
+            saveMembers(); }
+        window.currentDefaultersList = [];
+    </script>
+</body>
+</html>
